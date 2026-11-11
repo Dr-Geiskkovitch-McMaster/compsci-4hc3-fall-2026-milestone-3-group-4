@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Note</title>
+    <title>Agenda</title>
 
 
     <!-- CSS -->
@@ -23,29 +23,44 @@
 
     <!-- Importing components from the @material/web UI Library -->
      <script type="module">
-        import '@material/web/button/filled-button.js';
+        
      </script>
 
 </head>
 <body>
-    <main class="browse-notes-page">
-        <p>Text</p>
+
+    <main id="browse-view" class="app-view" style="display: none;">
+        <p>Browse Notes</p>
     </main>
 
+    <main id="agenda-view" class="app-view">
+        <p>Agenda</p>
+    </main>
+
+    <main id="review-view" class="app-view" style="display: none;">
+        <p>Review Notes</p>
+    </main>
 
     <nav class="bottom-nav-bar">
-        <button class="nav-item">
-            <span class="material-symbols-outlined nav-icon">list</span>
-            <span class="nav-label">Browse</span>
+        
+        <button class="nav-item" data-target="browse-view">
+                <span class="material-symbols-outlined nav-icon">list</span>
+                <span class="nav-label">Browse</span>
         </button>
-        <button class="nav-item">
+        
+        <button class="nav-item active" data-target="agenda-view">
             <span class="material-symbols-outlined nav-icon">calendar_today</span>
             <span class="nav-label">Agenda</span>
         </button>
-        <button class="nav-item">
+
+        <button class="nav-item" data-target="review-view">
             <span class="material-symbols-outlined nav-icon">inbox</span>
             <span class="nav-label">Review</span>
         </button>
+
     </nav>
+
+    <!--Javascript-->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

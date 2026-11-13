@@ -1,7 +1,49 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0");
+
 /* Defining colours in the M3 package for global styling use */
 :root {
     --md-sys-color-surface-container: #F3EDF7;
     --md-sys-color-on-surface-variant: #4A4458;
+    --md-sys-color-outline-variant: #CAC4D0;
+    --md-sys-color-primary-container: #EADDFF;
+
+    --md-ref-typeface-brand: 'Roboto', sans-serif;
+    --md-ref-typeface-plain: system-ui;
+}
+
+.top-nav-bar {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    align-items: center;
+}
+
+.nav-button {
+    --md-text-button-icon-color: var(--md-sys-color-on-surface-variant);
+}
+
+.filled-search-bar {
+    width: 100%;
+    max-width: 600px;
+
+    --md-filled-text-field-container-shape: 28px;
+    border-radius: 28px;
+    --md-filled-text-field-container-color: var(--md-sys-color-surface-container);
+    --md-filled-text-field-active-indicator-height: 0px;
+    --md-filled-text-field-focus-active-indicator-height: 0px;
+    --md-filled-text-field-hover-active-indicator-height: 0px;
+
+
+}
+
+.title-label-small {
+    font-family: var(--md-ref-typeface-brand);
+    font-size: 14px
+}
+
+.section-group h1.title-label-small {
+    padding-left: 16px;
 }
 
 .bottom-nav-bar {
@@ -18,7 +60,7 @@
 
 .nav-label {
     font-size: 12px;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--md-ref-typeface-brand);
     font-weight: 500;
 }
 

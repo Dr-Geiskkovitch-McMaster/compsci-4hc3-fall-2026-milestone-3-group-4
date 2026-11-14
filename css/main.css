@@ -8,6 +8,9 @@
     --md-sys-color-outline-variant: #CAC4D0;
     --md-sys-color-primary-container: #EADDFF;
     --md-sys-color-primary: #6750A4;
+    --md-sys-color-medium: #ab94ea;
+    --md-sys-color-light2: #c6b2e7;
+    --md-sys-color-light3: #d7c6f1;
 
     font-family: 'Roboto', sans-serif;
     --md-ref-typeface-brand: 'Roboto', sans-serif;
@@ -99,4 +102,18 @@
     gap: 4px;
 }
 
+/* Hover state */
+.nav-item:hover {
+  background-color: var(--md-sys-color-light3);
+}
 
+.nav-item.active {
+    background-color: var(--md-sys-color-light2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    gap: 4px;    
+}

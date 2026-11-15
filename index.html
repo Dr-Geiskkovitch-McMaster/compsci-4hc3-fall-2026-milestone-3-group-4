@@ -72,6 +72,17 @@
             </div>
             <p class="review-feedback" aria-live="polite">Swipe the note to review it.</p>
         </div>
+        <md-dialog id="reminder-date-set">
+            <div slot="headline">Set reminder date</div>
+            <form slot="content" id="reminder-form" method="dialog">
+                <label for="reminder-time">Reminder date and time</label>
+                <input id="reminder-time" type="datetime-local">
+            </form>
+            <div slot="actions">
+                <md-text-button form="reminder-form" value="cancel">Cancel</md-text-button>
+                <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
+            </div>
+        </md-dialog>
 
     </main>
 

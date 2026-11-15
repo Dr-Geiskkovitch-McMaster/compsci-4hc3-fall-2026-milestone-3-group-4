@@ -60,7 +60,9 @@ export function initializeReview() {
 
     const noteStack = reviewView.querySelector('.note-stack');
     const backNote = reviewView.querySelector('.sticky-note--back');
-    
+
+    const reminderDialog = document.querySelector('#reminder-date-set');
+    const reminderInput = document.querySelector('#reminder-time');    
 
     if (!reviewView || !note || !feedback || !noteStack || !backNote) {
         throw new Error('Review view is missing its note or feedback element.');
@@ -82,6 +84,26 @@ export function initializeReview() {
         down: () => showSwipeFeedback('down', '#var(--md-sys-color-surface-container)')
     };
 
+    function openReminderDialog() {
+        const reminder = notes[noteIndex].reminder;
+        reminderInput.value = reminder ? toLocalDateTimeValue(reminder) : '';
+        reminderDialog.show();
+    }
+
+    function toLocalDateTimeValue(date) {
+        const pad = value => String(value).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+            + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    reminderDialog.addEventListener('close', () => {
+        if (reminderDialog.returnValue !== 'save' || !reminderInput.value) return;
+
+        notes[noteIndex].reminder = new Date(reminderInput.value);
+        console.log(notes[noteIndex].reminder);
+        feedback.textContent = 'Reminder updated';
+    });
+
     function showSwipeFeedback(direction, color) {
         if (direction === 'left'){
             feedback.textContent = 'Note dismissed';
@@ -89,7 +111,9 @@ export function initializeReview() {
             feedback.textContent = 'Note resolved';
             notes[noteIndex].resolved = true;
         } else if (direction === 'up') {
-            feedback.textContent = 'You swiped up!';
+            feedback.textContent = 'Change reminder';
+            openReminderDialog();
+            return;
         } else if (direction == 'down'){
             feedback.textContent = 'Editing note';
         }

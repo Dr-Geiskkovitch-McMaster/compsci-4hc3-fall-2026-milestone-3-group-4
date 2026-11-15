@@ -63,7 +63,16 @@
 
     <!-- Review view -->
     <main id="review-view" class="app-view" style="display: none;">
-        <p>Review Notes</p>
+        <div class="review-block">
+            <div class="note-stack">
+                <div class="sticky-note sticky-note--back"></div>
+                <div class="sticky-note sticky-note--front">
+                    <p>This is a sample note.</p>
+                </div>
+            </div>
+            <p class="review-feedback" aria-live="polite">Swipe the note to review it.</p>
+        </div>
+
     </main>
 
     <!-- Navigation bar to switch views -->

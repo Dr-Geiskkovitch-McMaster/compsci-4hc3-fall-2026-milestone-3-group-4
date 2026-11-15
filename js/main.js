@@ -1,7 +1,11 @@
 
+import { initializeReview } from './review.js';
+
 // Script for switching views in place using navigation bar
 const navItems = document.querySelectorAll('.nav-item');
 const views = document.querySelectorAll('.app-view');
+
+initializeReview();
 
 navItems.forEach(item => {
   item.addEventListener('click', () => {

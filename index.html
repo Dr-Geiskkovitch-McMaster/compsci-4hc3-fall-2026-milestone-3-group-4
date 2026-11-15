@@ -53,10 +53,40 @@
     <main id="agenda-view" class="app-view">
 
         <section class="section-group">
-            <md-divider inset></md-divider>
+            <md-divider></md-divider>
             <h1 class="title-label-small">Today</h1>
             
-            <md-divider inset></md-divider>
+            <div class="horizontal-card">
+                <div class="card-content upcoming-deadline">
+                    <div class="card-actions">
+                        <md-filled-icon-button>
+                            <md-icon>Schedule</md-icon>
+                        </md-filled-icon-button>
+                    </div>
+                    <div class="card-text">
+                        <p class="card-body">Text from a note that has a deadline...</p>
+                    </div>
+            
+                    
+                </div>
+            </div>
+
+            <div class="horizontal-card">
+                <div class="card-content overdue-deadline">
+                    <div class="card-actions">
+                        <md-filled-icon-button class="deadline-button">
+                            <md-icon>Exclamation</md-icon>
+                        </md-filled-icon-button>
+                    </div>
+                    <div class="card-text">
+                        <p class="card-body">Text from a note that is overdue</p>
+                    </div>
+            
+                    
+                </div>
+            </div>
+
+            <md-divider></md-divider>
             <h1 class="title-label-small">Tomorrow</h1>
         </section>
     </main>

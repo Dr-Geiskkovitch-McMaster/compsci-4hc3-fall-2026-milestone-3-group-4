@@ -8,10 +8,18 @@
     --md-sys-color-outline-variant: #CAC4D0;
     --md-sys-color-primary-container: #EADDFF;
     --md-sys-color-primary: #6750A4;
+    --md-sys-color-dark-error-container: #F9DEDC;
+    --md-sys-color-dark-error: #F2B8B5;
+    --md-sys-color-light-error: #B3261E;
+    --md-sys-color-on-surface: #1D1B20;
 
     font-family: 'Roboto', sans-serif;
     --md-ref-typeface-brand: 'Roboto', sans-serif;
     --md-ref-typeface-plain: system-ui;
+}
+
+.app-view {
+    padding: 0 16px;
 }
 
 .top-nav-bar {
@@ -60,11 +68,62 @@
 
 .title-label-small {
     font-family: var(--md-ref-typeface-brand);
-    font-size: 14px
+    font-size: 14px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 16px;
 }
 
-.section-group h1.title-label-small {
-    padding-left: 16px;
+
+.horizontal-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 550px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    
+
+}
+
+.horizontal-card .upcoming-deadline {
+    background-color: var(--md-sys-color-primary-container);
+    border: 2px solid var(--md-sys-color-outline-variant);
+    box-sizing: border-box;
+    border-radius: var(--md-sys-shape-corner-large, 16px);
+}
+
+.horizontal-card .overdue-deadline {
+    background-color: var(--md-sys-color-dark-error-container);
+    border: 2px solid var(--md-sys-color-dark-error);
+    box-sizing: border-box;
+    border-radius: var(--md-sys-shape-corner-large, 16px);
+}
+
+.deadline-button {
+    --md-filled-icon-button-container-color: var(--md-sys-color-light-error); 
+}
+
+.card-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 16px;
+    flex: 1;
+    gap: 24px;
+}
+
+.card-body {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--md-sys-color-on-surface);
+    transform: translateY(1px);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .bottom-nav-bar {

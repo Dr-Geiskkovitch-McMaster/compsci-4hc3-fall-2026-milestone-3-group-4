@@ -1,5 +1,6 @@
 const swipeThreshold = 100;
 
+/* Hardcoded notes to show review functionality */
 export const notes = [
     {
         text: "Capstone: new model fine tuning approach? Ask TA",
@@ -17,7 +18,7 @@ export const notes = [
         text: "Gift for mom: long gold earrings",
         resolved: false,
         reminder: new Date(2026, 11, 15),
-        tags: ['christmas']
+        tags: ['home']
     },
     {
         text: "Lizzy mcalpine new album favs: \n Peach \n Ugly things \n two elevens",
@@ -51,7 +52,28 @@ export const notes = [
     }
 ];
 
-export const tags = ['school', 'random', 'food', 'capstone', 'christmas'];
+function getNoteTags(note) {
+    const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
+    if (!note.resolved) updatedTags.push('open');
+    if (!note.resolved && note.reminder && dateSoon(note.reminder,2)){
+        updatedTags.push('due');
+    }
+    
+    return updatedTags;
+}
+
+export const tags = [...new Set([...notes.flatMap(getNoteTags), 'due'])];
+export const tagColors = {
+    school: '#DDEBFF',
+    capstone: '#E8D9FF',
+    random: '#FFE6CC',
+    home: '#D7F2DF',
+    food: '#FFF2B3',
+    untagged: '#e6e3e3',
+    open: '#e6e3e3',
+    due: '#e6e3e3'
+}
+
 
 export function initializeReview() {
     const reviewView = document.querySelector('#review-view');
@@ -64,127 +86,128 @@ export function initializeReview() {
     const reminderDialog = document.querySelector('#reminder-date-set');
     const reminderInput = document.querySelector('#reminder-time');    
 
-    if (!reviewView || !note || !feedback || !noteStack || !backNote) {
+    const tagSearch = reviewView.querySelector('#review-tag');
+    const tagOptions = reviewView.querySelector('#review-tag-options');
+    const selectedTagList = reviewView.querySelector('#selected-review-tags');
+
+    const saveNewStack = reviewView.querySelector('#save-stack');
+    const saveNewStackDialog = reviewView.querySelector('#save-stack-dialog');
+
+    if (!reviewView || !note || !feedback || !noteStack || !backNote
+        || !tagSearch || !tagOptions || !selectedTagList 
+        || !reminderDialog ||! reminderInput) {
         throw new Error('Review view is missing its note or feedback element.');
     }
 
-    backNote.hidden = notes.length <= 1;
-
-    let startPoint;
-    let touchIdentifier;
-    let noteIndex = 0;
     const noteText = note.querySelector('p');
+    const noteTags = note.querySelector('.note-tags');
 
-    noteText.textContent = notes[noteIndex].text;
-
-    const swipeActions = {
-        left: () => showSwipeFeedback('left', 'var(--md-sys-color-surface-container)'),
-        right: () => showSwipeFeedback('right', '#var(--md-sys-color-surface-container)'),
-        up: () => showSwipeFeedback('up', '#var(--md-sys-color-surface-container)'),
-        down: () => showSwipeFeedback('down', '#var(--md-sys-color-surface-container)')
+    if (!noteText || !noteTags) {
+        throw new Error('Review note is missing its text or tags element.');
+    }
+    
+    const state = {
+        note,
+        noteText,
+        noteStack,
+        backNote,
+        noteTags,
+        feedback,
+        reviewView,
+        tagSearch,
+        tagOptions,
+        selectedTagList,
+        noteQueue: notes,
+        selectedTags: new Set(),
+        startPoint: undefined,
+        touchIdentifier: undefined,
+        noteIndex: 0,
+        reminderInput,
+        reminderDialog,
+        transitionHandler: undefined,
+        creatingNewStack: false,
+        saveNewStack,
+        saveNewStackDialog
     };
 
-    function openReminderDialog() {
-        const reminder = notes[noteIndex].reminder;
-        reminderInput.value = reminder ? toLocalDateTimeValue(reminder) : '';
-        reminderDialog.show();
-    }
+    state.transitionHandler = event => handleTransitionEnd(state, event);
 
-    function toLocalDateTimeValue(date) {
-        const pad = value => String(value).padStart(2, '0');
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
-            + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    }
-
-    reminderDialog.addEventListener('close', () => {
-        if (reminderDialog.returnValue !== 'save' || !reminderInput.value) return;
-
-        notes[noteIndex].reminder = new Date(reminderInput.value);
-        console.log(notes[noteIndex].reminder);
-        feedback.textContent = 'Reminder updated';
+    state.tagSearch.addEventListener('input', () => {
+        renderTagPicker(state)
     });
 
-    function showSwipeFeedback(direction, color) {
-        if (direction === 'left'){
-            feedback.textContent = 'Note dismissed';
-        } else if (direction === 'right'){
-            feedback.textContent = 'Note resolved';
-            notes[noteIndex].resolved = true;
-        } else if (direction === 'up') {
-            feedback.textContent = 'Change reminder';
-            openReminderDialog();
-            return;
-        } else if (direction == 'down'){
-            feedback.textContent = 'Editing note';
+    let lastKey = '';
+    state.tagSearch.addEventListener('keydown', (event)=>{
+        if (event.key === "Enter") {
+            const searchTerm = state.tagSearch.value.trim().toLowerCase();
+            const matchingTags = tags.filter(tag =>
+                !state.selectedTags.has(tag) && tag.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchingTags.length === 1){
+                event.preventDefault();
+                selectTag(state,matchingTags[0]);
+            };
         }
+        if (event.key === 'Backspace' && lastKey === 'Backspace' && state.tagSearch.value === '' && state.selectedTags.size > 0){
+            event.preventDefault();
 
-        note.style.backgroundColor = color;
+            const lastTag = [...state.selectedTags].at(-1);
+            state.selectedTags.delete(lastTag);
 
-        const movement = {
-            left: 'translateX(-120vw) rotate(-12deg)',
-            right: 'translateX(120vw) rotate(12deg)',
-            up: 'translateY(-120vh) rotate(8deg)',
-            down: 'translateY(120vh) rotate(-8deg)'
-        };
-
-        note.style.transform = movement[direction];
-
-        function handleTransitionEnd(event) {
-            if (event.propertyName !== 'transform') return;
-            note.removeEventListener('transitionend', handleTransitionEnd);
-
-            noteIndex += 1;
-            while (notes[noteIndex].resolved === true) {
-                noteIndex += 1;
-            }
-            
-            if (noteIndex >= notes.length){
-                noteStack.hidden = true;
-                feedback.textContent = 'Empty stack';
-                return;
-            }
-
-            noteText.textContent = notes[noteIndex].text;
-            backNote.hidden = noteIndex === notes.length - 1;
-
-            note.style.transition = 'none';
-            note.style.transform = 'none';
-            note.style.backgroundColor = '';
-            void note.offsetWidth; 
-            note.style.transition = '';
+            renderTagPicker(state);
+            updateNoteQueue(state);
+            updateSaveButtonVisibility(state);
         }
+        lastKey = event.key;
+    });
 
-        note.addEventListener('transitionend', handleTransitionEnd);
-    }
+    renderTagPicker(state);
+    showCurrentNote(state);
+
+    const swipeActions = {
+        left: () => showSwipeFeedback(state,'left', 'var(--md-sys-color-surface-container)'),
+        right: () => showSwipeFeedback(state,'right', '#var(--md-sys-color-surface-container)'),
+        up: () => showSwipeFeedback(state,'up', '#var(--md-sys-color-surface-container)'),
+        down: () => showSwipeFeedback(state,'down', '#var(--md-sys-color-surface-container)')
+    };
+
+    state.reminderDialog.addEventListener('close', () => {
+        if (state.reminderDialog.returnValue !== 'save' || !state.reminderInput.value) return;
+
+        state.noteQueue[state.noteIndex].reminder = new Date(state.reminderInput.value);
+        state.feedback.textContent = 'Reminder updated';
+        updateNoteQueue(state);
+    });
 
     note.addEventListener('touchstart', event => {
         if (event.touches.length !== 1) {
-            startPoint = undefined;
-            touchIdentifier = undefined;
+            state.startPoint = undefined;
+            state.touchIdentifier = undefined;
             return;
         }
 
         const touch = event.touches[0];
-        touchIdentifier = touch.identifier;
-        startPoint = { x: touch.clientX, y: touch.clientY };
+        state.touchIdentifier = touch.identifier;
+        state.startPoint = { x: touch.clientX, y: touch.clientY };
     }, { passive: true });
 
     note.addEventListener('touchend', event => {
-        if (!startPoint || touchIdentifier === undefined) {
+        if (!state.startPoint || state.touchIdentifier === undefined) {
             return;
         }
 
         const touch = Array.from(event.changedTouches)
-            .find(changedTouch => changedTouch.identifier === touchIdentifier);
+            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
         if (!touch) {
             return;
         }
 
-        const horizontalDistance = touch.clientX - startPoint.x;
-        const verticalDistance = touch.clientY - startPoint.y;
+        const horizontalDistance = touch.clientX - state.startPoint.x;
+        const verticalDistance = touch.clientY - state.startPoint.y;
 
-        startPoint = undefined;
-        touchIdentifier = undefined;
+        state.startPoint = undefined;
+        state.touchIdentifier = undefined;
 
         if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)
             && Math.abs(horizontalDistance) > swipeThreshold) {
@@ -195,7 +218,203 @@ export function initializeReview() {
     }, { passive: true });
 
     note.addEventListener('touchcancel', () => {
-        startPoint = undefined;
-        touchIdentifier = undefined;
+        state.startPoint = undefined;
+        state.touchIdentifier = undefined;
     });
+
+    state.saveNewStack.addEventListener('click', () => {
+        openNewStackDialog(state);
+    });
+
+    state.saveNewStackDialog.addEventListener('close', () => {
+        if (state.saveNewStackDialog.returnValue !== 'save' || state.selectedTags.size === 0) return;
+        updateNoteQueue(state);
+    });
+
+    function setStack(selectedStack){
+        if (selectedStack === "new-stack-button"){
+            createNewStack(state);
+        } else {
+            state.creatingNewStack = false;
+            console.log(selectedStack);
+            state.selectedTags.clear();
+            selectTag(state,selectedStack);
+        }
+    }
+
+    return {setStack, clearTags: () => clearTags(state)};
+}
+
+function updateSaveButtonVisibility(state) {
+    state.saveNewStack.hidden = state.selectedTags.size === 0;
+}
+
+function createNewStack(state){
+    state.creatingNewStack = true;
+    clearTags(state);
+    state.tagSearch.value = '';
+    renderTagPicker(state);
+    updateNoteQueue(state);
+}
+
+function showCurrentNote(state) {
+    while (state.noteIndex < state.noteQueue.length && state.noteQueue[state.noteIndex].resolved) {
+        state.noteIndex += 1;
+    }
+
+    if (state.noteIndex >= state.noteQueue.length) {
+        state.noteStack.hidden = true;
+        state.noteTags.replaceChildren();
+        state.feedback.textContent = state.creatingNewStack? 'Select tags to create a stack.' : 'Empty stack';
+        return;
+    }
+
+    state.noteStack.hidden = false;
+    const currentNote = state.noteQueue[state.noteIndex];
+    state.noteText.textContent = currentNote.text;
+    state.noteTags.replaceChildren();
+    (getNoteTags(currentNote) ?? []).forEach(tag => {
+        if (tag !== 'untagged' && tag !== 'open' && tag !== 'due'){
+            const chip = document.createElement('span');
+            chip.className = 'note-tag';
+            chip.textContent = tag;
+            chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+            state.noteTags.append(chip);
+        }
+    });
+    state.backNote.hidden = state.noteQueue.slice(state.noteIndex + 1)
+        .every(queuedNote => queuedNote.resolved);
+}
+
+function updateNoteQueue(state) {
+    if (state.selectedTags.size > 0) {
+        state.noteQueue = notes.filter (note =>
+            getNoteTags(note).some(tag => state.selectedTags.has(tag))
+        );
+    } else {
+        state.noteQueue = state.creatingNewStack ? [] : notes;
+    }
+
+    state.noteIndex = 0;
+    showCurrentNote(state);
+}
+
+function selectTag(state, tag) {
+    state.selectedTags.add(tag);
+    state.tagSearch.value = '';
+    renderTagPicker(state);
+    updateNoteQueue(state);
+    state.tagSearch.focus();
+    updateSaveButtonVisibility(state);
+}
+
+function clearTags(state) {
+    state.saveNewStack.hidden = true;
+    state.selectedTags.clear();
+    state.tagSearch.value = '';
+    renderTagPicker(state);
+    updateNoteQueue(state);
+    updateSaveButtonVisibility(state);
+    state.tagSearch.focus();
+}
+
+/* Function to render the tag options based on what has been typed in the search bar */
+function renderTagPicker(state) {
+    const searchTerm = state.tagSearch.value.trim().toLowerCase();
+    const matchingTags = tags.filter(tag =>
+        !state.selectedTags.has(tag) && tag.toLowerCase().includes(searchTerm)
+    );
+
+    /* render each matching tag as a button */
+    state.tagOptions.replaceChildren();
+    matchingTags.forEach(tag => {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        option.className = 'tag-option';
+        option.textContent = tag;
+        option.addEventListener('click', () => {
+            selectTag(state,tag);
+        });
+        state.tagOptions.append(option);
+    });
+
+    /* render each selected tag */
+    state.selectedTagList.replaceChildren();
+    state.selectedTags.forEach(tag => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'selected-tag';
+        chip.textContent = `${tag} ×`;
+        chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        chip.setAttribute('aria-label', `Remove ${tag} tag`);
+        chip.addEventListener('click', () => {
+            state.selectedTags.delete(tag);
+            renderTagPicker(state);
+            updateNoteQueue(state);
+        });
+        state.selectedTagList.append(chip);
+    });
+}
+    
+function openReminderDialog(state) {
+    const reminder = state.noteQueue[state.noteIndex].reminder;
+    state.reminderInput.value = reminder ? toLocalDateTimeValue(reminder) : '';
+    state.reminderDialog.show();
+}
+
+function openNewStackDialog(state) {
+    state.saveNewStackDialog.show();
+}
+
+function toLocalDateTimeValue(date) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+        + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function dateSoon(date,threshold) {
+    const daysUntil = (date.getTime() - Date.now())/ (1000 * 60 * 60 * 24);
+    return (daysUntil < threshold);
+}
+
+function showSwipeFeedback(state, direction, color) {
+    if (direction === 'left'){
+        state.feedback.textContent = 'Note dismissed';
+    } else if (direction === 'right'){
+        state.feedback.textContent = 'Note resolved';
+        state.noteQueue[state.noteIndex].resolved = true;
+    } else if (direction === 'up') {
+        state.feedback.textContent = 'Change reminder';
+        openReminderDialog(state);
+        return;
+    } else if (direction == 'down'){
+        state.feedback.textContent = 'Editing note';
+    }
+
+    state.note.style.backgroundColor = color;
+
+    const movement = {
+        left: 'translateX(-120vw) rotate(-12deg)',
+        right: 'translateX(120vw) rotate(12deg)',
+        up: 'translateY(-120vh) rotate(8deg)',
+        down: 'translateY(120vh) rotate(-8deg)'
+    };
+
+    state.note.style.transform = movement[direction];
+
+    state.note.addEventListener('transitionend', state.transitionHandler);
+}
+
+function handleTransitionEnd(state,event) {
+    if (event.propertyName !== 'transform') return;
+    state.note.removeEventListener('transitionend', state.transitionHandler);
+
+    state.noteIndex += 1;
+
+    state.note.style.transition = 'none';
+    state.note.style.transform = 'none';
+    state.note.style.backgroundColor = '';
+    state.note.style.transition = '';
+    showCurrentNote(state);
 }

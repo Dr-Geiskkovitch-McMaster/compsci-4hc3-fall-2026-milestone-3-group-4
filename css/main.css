@@ -97,6 +97,26 @@
     color: var(--md-sys-color-on-surface-variant);
     text-decoration: none;
     gap: 4px;
+    cursor: pointer;
+}
+
+.nav-item md-icon {
+    width: 64px;
+    height: 32px;
+    border-radius: 16px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item.active {
+    color: var(--md-sys-color-primary);
+}
+
+.nav-item.active md-icon {
+    background-color: var(--md-sys-color-primary-container);
+}
+
+.nav-item.active .nav-label {
+    font-weight: 700;
 }
 
 

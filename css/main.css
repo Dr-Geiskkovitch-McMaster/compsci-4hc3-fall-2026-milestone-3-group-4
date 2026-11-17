@@ -120,3 +120,82 @@
 }
 
 
+/* Card Styling */
+.card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 12px;
+}
+
+.m3-card {
+    position: relative;
+    display: flex; /* row by default */
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: var(--md-sys-color-surface-container-low, #f7f2fa);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.card-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.card-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--md-sys-color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 400;
+    color: #1D1B20;
+}
+
+.card-stat-value {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1D1B20;
+}
+
+.card-stat-value--muted {
+    font-weight: 400;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.card-stat-label {
+    font-size: 12px;
+    line-height: 1.2;
+    color: #1D1B20;
+}
+
+
+
+

@@ -52,6 +52,49 @@ export const notes = [
     }
 ];
 
+export const stacks = [
+    {
+        name: "Open Loops",
+        tags: ['open'],
+        type: 'default'
+    }, 
+    {
+        name: "Untagged",
+        tags: ['untagged'],
+        type: 'default'
+    },  
+    {
+        name: "Due Soon",
+        tags: ['due'],
+        type: 'default'
+    },  
+    {
+        name: "School",
+        tags: ['school'],
+        type: 'tag'
+    },   
+    {
+        name: "Random",
+        tags: ['random'],
+        type: 'tag'
+    },   
+    {
+        name: "Home",
+        tags: ['home'],
+        type: 'tag'
+    },   
+    {
+        name: "Capstone",
+        tags: ['capstone'],
+        type: 'tag'
+    },   
+    {
+        name: "Food",
+        tags: ['food'],
+        type: 'tag'
+    }
+];
+
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
     if (!note.resolved) updatedTags.push('open');
@@ -92,6 +135,7 @@ export function initializeReview() {
 
     const saveNewStack = reviewView.querySelector('#save-stack');
     const saveNewStackDialog = reviewView.querySelector('#save-stack-dialog');
+    const newStackInput = reviewView.querySelector('#stack-name');
 
     if (!reviewView || !note || !feedback || !noteStack || !backNote
         || !tagSearch || !tagOptions || !selectedTagList 
@@ -127,6 +171,7 @@ export function initializeReview() {
         transitionHandler: undefined,
         creatingNewStack: false,
         saveNewStack,
+        newStackInput,
         saveNewStackDialog
     };
 
@@ -229,6 +274,19 @@ export function initializeReview() {
     state.saveNewStackDialog.addEventListener('close', () => {
         if (state.saveNewStackDialog.returnValue !== 'save' || state.selectedTags.size === 0) return;
         updateNoteQueue(state);
+
+        /* save new stack */
+        const newStack = {
+            name: state.newStackInput.value,
+            tags: [...state.selectedTags],
+            type: 'custom'
+        } 
+
+        stacks.push(newStack);
+        console.log(stacks);
+        document.dispatchEvent(new CustomEvent('stack-created', {
+            detail:newStack
+        }));
     });
 
     function setStack(selectedStack){
@@ -236,9 +294,12 @@ export function initializeReview() {
             createNewStack(state);
         } else {
             state.creatingNewStack = false;
-            console.log(selectedStack);
             state.selectedTags.clear();
-            selectTag(state,selectedStack);
+            selectedStack.forEach(tag => state.selectedTags.add(tag));
+            state.tagSearch.value = '';
+            renderTagPicker(state);
+            updateNoteQueue(state);
+            updateSaveButtonVisibility(state);
         }
     }
 
@@ -246,7 +307,13 @@ export function initializeReview() {
 }
 
 function updateSaveButtonVisibility(state) {
-    state.saveNewStack.hidden = state.selectedTags.size === 0;
+    const stackAlreadyExists = stacks.some(stack =>
+        stack.tags.length === state.selectedTags.size
+        && stack.tags.every(tag => state.selectedTags.has(tag))
+    );
+
+    state.saveNewStack.hidden =
+        state.selectedTags.size === 0 || stackAlreadyExists;
 }
 
 function createNewStack(state){

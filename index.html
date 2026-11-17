@@ -65,55 +65,20 @@
     <main id="review-view" class="app-view" style="display: none;">
         <section id="review-home">
             <hr>
-            <label for="review-options">Stacks</label>
-            <div class="review-stacks">
+            <label for="review-options">Custom Stacks</label>
+            <div id="custom-stacks" class="review-stacks">
                 <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="new-stack-button">+</button>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="open">Open Loops</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="untagged">Untagged</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="due">Due Soon</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
+                    <button id="new-stack-button" class="layer stack-button"
+                            data-stack="new-stack-button">+</button>
                 </div>
             </div>
             <hr>
-            <label for="review-options">Tags</label>
-            <div class="review-stacks">
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="school">School</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="random">Random</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="home">Home</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="capstone">Capstone</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
-                <div class="stack-grid">
-                    <button class="layer stack-button" data-stack="food">Food</button>
-                    <div class="layer layer-2"></div>
-                    <div class="layer layer-3"></div>
-                </div>
+            <label>Default Stacks</label>
+                <div id="default-stacks" class="review-stacks"></div>
+            </div>
+            <hr>
+            <label>Tags</label>
+                <div id="tag-stacks" class="review-stacks"></div>
             </div>
         </section>
         

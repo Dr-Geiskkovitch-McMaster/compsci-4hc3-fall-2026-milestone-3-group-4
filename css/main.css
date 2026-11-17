@@ -85,7 +85,7 @@
 
 }
 
-.horizontal-card .upcoming-deadline {
+.horizontal-card .basic {
     background-color: var(--md-sys-color-primary-container);
     border: 2px solid var(--md-sys-color-outline-variant);
     box-sizing: border-box;
@@ -124,6 +124,104 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.add-button {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    z-index: 1000;
+}
+
+.text-creation-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+
+    background-color: white;
+    border-top-left-radius: var(--md-sys-shape-corner-extra-large, 28px);
+    border-top-right-radius: var(--md-sys-shape-corner-extra-large, 28px);
+    font-family: 'Roboto', sans-serif;
+    padding: 8px 12px 12px 12px;
+    z-index: 110;
+    box-sizing: border-box;
+}
+
+.text-creation-panel.fullscreen {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 100vh !important;
+    border-radius: 0 !important; 
+    padding-top: env(safe-area-inset-top, 16px); 
+}
+
+.text-creation-panel.fullscreen .text-creation-textarea {
+    flex: 1;
+    max-height: none;
+    height: 100%;
+}
+
+.panel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    gap: 8px;
+}
+
+.panel-top-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.text-creation-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: black;
+    opacity: 0.7;
+    z-index: 100;
+}
+
+.text-creation-textarea {
+    width: 100%;
+    min-height: 96px;
+    max-height: 35vh;
+    padding: 8px 12px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.panel-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.text-creation-textarea::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: 'Roboto', sans-serif;
+  opacity: 0.7;
+}
+
+.bottom-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .bottom-nav-bar {

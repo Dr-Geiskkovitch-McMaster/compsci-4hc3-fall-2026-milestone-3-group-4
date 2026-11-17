@@ -63,7 +63,79 @@
 
     <!-- Review view -->
     <main id="review-view" class="app-view" style="display: none;">
-        <p>Review Notes</p>
+        <section id="review-home">
+            <hr>
+            <label for="review-options">Custom Stacks</label>
+            <div id="custom-stacks" class="review-stacks">
+                <div class="stack-grid">
+                    <button id="new-stack-button" class="layer stack-button"
+                            data-stack="new-stack-button">+</button>
+                </div>
+            </div>
+            <hr>
+            <label>Default Stacks</label>
+                <div id="default-stacks" class="review-stacks"></div>
+            </div>
+            <hr>
+            <label>Tags</label>
+                <div id="tag-stacks" class="review-stacks"></div>
+            </div>
+        </section>
+        
+        <section id="active-review" hidden>
+            <div class="top-button-review">
+                <button id="exit-review" aria-label="Exit review">×</button>
+            </div>
+            <div class="review-block">
+                <label for="review-tag">Review by tag</label>
+                <div class="tag-picker">
+                    <div class="tag-input-container">
+                        <div id="selected-review-tags" class="selected-tags" aria-label="Selected tags"></div>
+                        <input
+                            id="review-tag"
+                            type="search"
+                            placeholder="Type or choose a tag"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div id="review-tag-options" class="tag-options" aria-label="Tag suggestions"></div>
+                </div>
+                <button id="save-stack" hidden>Save Filters as New Stack</button>
+                <div class="note-stack">
+                    <div class="sticky-note sticky-note--back"></div>
+                    <div class="sticky-note sticky-note--front">
+                        <p>This is a sample note.</p>
+                        <div class="note-tags" aria-label="Note tags"></div>
+                    </div>
+                </div>
+                <p class="review-feedback" aria-live="polite">Swipe the note to review it.</p>
+            </div>
+        </section>
+
+        <md-dialog id="save-stack-dialog">
+            <div slot="headline">Save new stack</div>
+            <form slot="content" id="stack-form" method="dialog">
+                <label for="stack-name">Stack Name</label>
+                <input id="stack-name" type="text">
+            </form>
+            <div slot="actions">
+                <md-text-button form="stack-form" value="cancel">Cancel</md-text-button>
+                <md-filled-button form="stack-form" value="save">Save</md-filled-button>
+            </div>
+        </md-dialog>
+
+        <md-dialog id="reminder-date-set">
+            <div slot="headline">Set reminder date</div>
+            <form slot="content" id="reminder-form" method="dialog">
+                <label for="reminder-time">Reminder date and time</label>
+                <input id="reminder-time" type="datetime-local">
+            </form>
+            <div slot="actions">
+                <md-text-button form="reminder-form" value="cancel">Cancel</md-text-button>
+                <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
+            </div>
+        </md-dialog>
+
     </main>
 
     <!-- Navigation bar to switch views -->

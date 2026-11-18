@@ -132,6 +132,19 @@
     padding: 25px;
 }
 
+.stack-count {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 4;
+    min-width: 1.5em;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--md-sys-color-primary-container);
+    text-align: center;
+    font-size: 0.75rem;
+}
+
 .stack-grid {
   display: grid;
   width: 35vw;
@@ -170,10 +183,6 @@
 
 #new-stack-button {
     font-size: 30px;
-}
-
-#save-stack {
-
 }
 
 .review-block{

@@ -56,17 +56,17 @@ export const stacks = [
     {
         name: "Open Loops",
         tags: ['open'],
-        type: 'default'
+        type: 'filter'
     }, 
     {
         name: "Untagged",
         tags: ['untagged'],
-        type: 'default'
+        type: 'filter'
     },  
     {
         name: "Due Soon",
         tags: ['due'],
-        type: 'default'
+        type: 'filter'
     },  
     {
         name: "School",
@@ -182,18 +182,21 @@ export function initializeReview() {
     });
 
     let lastKey = '';
+
+    /** Listener for the searching tags */
     state.tagSearch.addEventListener('keydown', (event)=>{
         if (event.key === "Enter") {
             const searchTerm = state.tagSearch.value.trim().toLowerCase();
             const matchingTags = tags.filter(tag =>
                 !state.selectedTags.has(tag) && tag.toLowerCase().includes(searchTerm)
             );
-
+             /** select a tag if it's the only one left matching */
             if (matchingTags.length === 1){
                 event.preventDefault();
                 selectTag(state,matchingTags[0]);
             };
         }
+        /** only delete tags if double backspace */
         if (event.key === 'Backspace' && lastKey === 'Backspace' && state.tagSearch.value === '' && state.selectedTags.size > 0){
             event.preventDefault();
 
@@ -254,6 +257,7 @@ export function initializeReview() {
         state.startPoint = undefined;
         state.touchIdentifier = undefined;
 
+        /** determine whether touch warrants a swipe */
         if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)
             && Math.abs(horizontalDistance) > swipeThreshold) {
             swipeActions[horizontalDistance > 0 ? 'right' : 'left']();
@@ -284,11 +288,14 @@ export function initializeReview() {
 
         stacks.push(newStack);
         console.log(stacks);
+
+        /** log event so stack can be rendered */
         document.dispatchEvent(new CustomEvent('stack-created', {
             detail:newStack
         }));
     });
 
+    /** accessible by main.js, function to set which stack is reviewed */
     function setStack(selectedStack){
         if (selectedStack === "new-stack-button"){
             createNewStack(state);
@@ -303,9 +310,10 @@ export function initializeReview() {
         }
     }
 
-    return {setStack, clearTags: () => clearTags(state)};
+    return {setStack, clearTags: () => clearTags(state), countStackNotes};
 }
 
+/* save button is only visible when stack with selected tags doesn't already exist */
 function updateSaveButtonVisibility(state) {
     const stackAlreadyExists = stacks.some(stack =>
         stack.tags.length === state.selectedTags.size
@@ -314,6 +322,13 @@ function updateSaveButtonVisibility(state) {
 
     state.saveNewStack.hidden =
         state.selectedTags.size === 0 || stackAlreadyExists;
+}
+
+/* count notes in stack for ui */
+function countStackNotes(stack) {
+    return notes.filter(note =>
+        !note.resolved && stack.tags.some(tag => getNoteTags(note).includes(tag))
+    ).length;
 }
 
 function createNewStack(state){
@@ -340,6 +355,7 @@ function showCurrentNote(state) {
     const currentNote = state.noteQueue[state.noteIndex];
     state.noteText.textContent = currentNote.text;
     state.noteTags.replaceChildren();
+    /** draw tags on the note */
     (getNoteTags(currentNote) ?? []).forEach(tag => {
         if (tag !== 'untagged' && tag !== 'open' && tag !== 'due'){
             const chip = document.createElement('span');
@@ -353,6 +369,7 @@ function showCurrentNote(state) {
         .every(queuedNote => queuedNote.resolved);
 }
 
+/** update queue for when tags are selected */
 function updateNoteQueue(state) {
     if (state.selectedTags.size > 0) {
         state.noteQueue = notes.filter (note =>

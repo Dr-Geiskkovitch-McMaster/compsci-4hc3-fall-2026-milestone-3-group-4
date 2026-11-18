@@ -52,6 +52,12 @@ function renderStacks(stack) {
     grid.append(layer);
   }
 
+  const count = document.createElement('span');
+  count.className = 'stack-count';
+  count.textContent = review.countStackNotes(stack);
+  count.dataset.stackIndex = reviewStacks.indexOf(stack);
+  grid.append(button, count);
+
   const container = document.querySelector('#' + stack.type +'-stacks')
 
   container.append(grid);
@@ -79,11 +85,19 @@ document.querySelector('#new-stack-button').addEventListener('click', () => {
   review.setStack('new-stack-button');
 });
 
+function updateStackCount() {
+  document.querySelectorAll('.stack-count').forEach(count => {
+    const stack = reviewStacks[Number(count.dataset.stackIndex)];
+    count.textContent = String(review.countStackNotes(stack));
+  });
+}
+
 document.querySelector('#exit-review').addEventListener('click', () => {
   reviewHome.hidden = false;
   activeReview.hidden = true;
   topNavBar.classList.remove('review-mode');
   bottomNavBar.classList.remove('review-mode');
+  updateStackCount();
   review.clearTags();
 });
 

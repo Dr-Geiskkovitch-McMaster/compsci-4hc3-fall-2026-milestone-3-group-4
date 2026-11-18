@@ -11,6 +11,10 @@
     --md-sys-color-outline-filter: #a4aebc;
     --md-sys-color-filter-container: #dde8f6;
     --md-sys-color-primary: #6750A4;
+    --md-sys-color-dark-error-container: #F9DEDC;
+    --md-sys-color-dark-error: #F2B8B5;
+    --md-sys-color-light-error: #B3261E;
+    --md-sys-color-on-surface: #1D1B20;
     --md-sys-color-filter: #3b7dd4;
     --md-sys-color-medium: #ab94ea;
     --md-sys-color-light2: #c6b2e7;
@@ -38,6 +42,10 @@ html::-webkit-scrollbar {
 }
 
 .top-nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
     display: flex;
     justify-content: center;
     padding: 16px 24px 16px;
@@ -99,10 +107,159 @@ html::-webkit-scrollbar {
 .title-label-small {
     font-family: var(--md-ref-typeface-brand);
     font-size: 14px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 16px;
 }
 
-.section-group h1.title-label-small {
-    padding-left: 16px;
+
+.horizontal-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 550px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    
+
+}
+
+.horizontal-card .basic {
+    background-color: var(--md-sys-color-primary-container);
+    border: 2px solid var(--md-sys-color-outline-variant);
+    box-sizing: border-box;
+    border-radius: var(--md-sys-shape-corner-large, 16px);
+}
+
+.horizontal-card .overdue-deadline {
+    background-color: var(--md-sys-color-dark-error-container);
+    border: 2px solid var(--md-sys-color-dark-error);
+    box-sizing: border-box;
+    border-radius: var(--md-sys-shape-corner-large, 16px);
+}
+
+.deadline-button {
+    --md-filled-icon-button-container-color: var(--md-sys-color-light-error); 
+}
+
+.card-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 16px;
+    flex: 1;
+    gap: 24px;
+}
+
+.card-body {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--md-sys-color-on-surface);
+    transform: translateY(1px);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.add-button {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    z-index: 1000;
+}
+
+.text-creation-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+
+    background-color: white;
+    border-top-left-radius: var(--md-sys-shape-corner-extra-large, 28px);
+    border-top-right-radius: var(--md-sys-shape-corner-extra-large, 28px);
+    font-family: 'Roboto', sans-serif;
+    padding: 8px 12px 12px 12px;
+    z-index: 110;
+    box-sizing: border-box;
+}
+
+.text-creation-panel.fullscreen {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 100vh !important;
+    border-radius: 0 !important; 
+    padding-top: env(safe-area-inset-top, 16px); 
+}
+
+.text-creation-panel.fullscreen .text-creation-textarea {
+    flex: 1;
+    max-height: none;
+    height: 100%;
+}
+
+.panel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    gap: 8px;
+}
+
+.panel-top-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.text-creation-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: black;
+    opacity: 0.7;
+    z-index: 100;
+}
+
+.text-creation-textarea {
+    width: 100%;
+    min-height: 96px;
+    max-height: 35vh;
+    padding: 8px 12px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.panel-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.text-creation-textarea::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: 'Roboto', sans-serif;
+  opacity: 0.7;
+}
+
+.bottom-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .bottom-nav-bar {

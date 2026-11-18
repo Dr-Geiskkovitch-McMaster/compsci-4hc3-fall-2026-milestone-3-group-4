@@ -87,13 +87,63 @@
     <!-- Agenda/create notes view -->
     <main id="agenda-view" class="app-view">
 
+    
         <section class="section-group">
-            <md-divider inset></md-divider>
-            <h1 class="title-label-small">Today</h1>
-            
-            <md-divider inset></md-divider>
-            <h1 class="title-label-small">Tomorrow</h1>
-        </section>
+            <div id="card-container">
+                <md-divider></md-divider>
+                <h1 class="title-label-small">Today</h1>
+                
+                <div id="card-container-today">
+                    <div class="horizontal-card">
+                        <div class="card-content basic">
+                            <div class="card-actions">
+                                <md-filled-icon-button>
+                                    <md-icon>Schedule</md-icon>
+                                </md-filled-icon-button>
+                            </div>
+                            <div class="card-text">
+                                <p class="card-body">Text from a note that has a deadline...</p>
+                            </div>
+                    
+                            
+                        </div>
+                    </div>
+
+                    <div class="horizontal-card">
+                        <div class="card-content overdue-deadline">
+                            <div class="card-actions">
+                                <md-filled-icon-button class="deadline-button">
+                                    <md-icon>Exclamation</md-icon>
+                                </md-filled-icon-button>
+                            </div>
+                            <div class="card-text">
+                                <p class="card-body">Text from a note that is overdue</p>
+                            </div>
+                    
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <md-divider></md-divider>
+                <h1 class="title-label-small">Tomorrow</h1>
+
+                <div class="horizontal-card">
+                    <div class="card-content basic">
+                        <div class="card-actions">
+                            <md-filled-icon-button>
+                                <md-icon>Edit</md-icon>
+                            </md-filled-icon-button>
+                        </div>
+                        <div class="card-text">
+                            <p class="card-body">Text from a note that has no deadline...</p>
+                        </div>
+                
+                        
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <!-- Review view -->
@@ -169,6 +219,61 @@
 
     </main>
 
+    <!-- Fab button to create notes -->
+    <md-fab variant="primary" id="add-fab" class="add-button">
+        <md-icon slot="icon">add</md-icon>
+    </md-fab>
+
+    <div id="text-creation-backdrop" class="text-creation-backdrop hidden"></div>
+
+    <!-- Text field area for user notes -->
+     <div id="text-creation-panel" class="text-creation-panel hidden">
+
+        <div id="panel-top" class="panel-top">
+            <md-icon-button id="close-button">
+                <md-icon>Close</md-icon>
+            </md-icon-button>
+
+            <div class="panel-top-right">
+                <md-icon-button id="star-button">
+                    <md-icon>Star</md-icon>
+                </md-icon-button>
+                <md-icon-button id="expand-button">
+                    <md-icon id="expand-icon">expand_content</md-icon>
+                </md-icon-button>
+            </div>
+            
+        </div>
+
+        <!-- Typing area -->
+        <textarea id="text-creation-textarea" class="text-creation-textarea"
+        placeholder="Type note here..."
+        rows="4"></textarea>
+
+        <!-- Bottom Toolbar (attachments, tags, markdown)-->
+        <div class="panel-bottom">
+            <div class="bottom-icons">
+                <md-icon-button>
+                    <md-icon>add_photo_alternate</md-icon>
+                </md-icon-button>
+                <md-icon-button>
+                    <md-icon>target</md-icon>
+                </md-icon-button>
+                <md-icon-button>
+                    <md-icon>tag</md-icon>
+                </md-icon-button>
+            </div>
+
+            <md-filled-icon-button id="submit-button" >
+                <md-icon>send</md-icon>
+            </md-filled-icon-button>
+        </div>
+
+        
+
+
+     </div>
+
     <!-- Navigation bar to switch views -->
     <nav class="bottom-nav-bar">
         
@@ -202,5 +307,6 @@
     </section>
 
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/create.js"></script>
 </body>
 </html>

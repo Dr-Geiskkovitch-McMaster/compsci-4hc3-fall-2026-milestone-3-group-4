@@ -307,7 +307,7 @@ function showCurrentNote(state) {
 
     state.noteStack.hidden = false;
     const currentNote = state.noteQueue[state.noteIndex];
-    state.noteText.textContent = currentNote.text;
+    state.noteText.textContent = currentNote.text ? currentNote.text : `AUDIO: ${currentNote.audio.transcript}`;
     state.noteTags.replaceChildren();
     /** draw tags on the note */
     (getNoteTags(currentNote) ?? []).forEach(tag => {

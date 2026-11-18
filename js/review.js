@@ -3,15 +3,15 @@ import appData, { getColorPair } from './data.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
-    if (!note.resolved) updatedTags.push('open');
-    if (!note.resolved && note.reminder && dateSoon(note.reminder,2)){
+    if (note.open) updatedTags.push('open');
+    if (note.open && note.dueDate && dateSoon(new Date(note.dueDate),2)){
         updatedTags.push('due');
     }
     
     return updatedTags;
 }
 
-export const tags = [...new Set([...appData.notes.flatMap(getNoteTags), 'due'])];
+export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
 export const stacks = [
     { name: "Open Loops", tags: ['open'], type: 'filter', icon: 'inbox' },
     { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
@@ -242,7 +242,7 @@ export function initializeReview() {
         const newStack = {
             name: state.newStackInput.value,
             tags: [...state.selectedTags],
-            type: 'custom'
+            type: 'filter'
         } 
 
         stacks.push(newStack);
@@ -274,9 +274,14 @@ export function initializeReview() {
 
 /* save button is only visible when stack with selected tags doesn't already exist */
 function updateSaveButtonVisibility(state) {
-    const stackAlreadyExists = stacks.some(stack =>
-        stack.tags.length === state.selectedTags.size
-        && stack.tags.every(tag => state.selectedTags.has(tag))
+    const selectedTags = new Set([...state.selectedTags].filter(tag => tag !== 'open'));
+    const stackAlreadyExists = stacks.some(stack => {
+        const stackTags = stack.tags.filter(tag => tag !== 'open');
+
+        return stackTags.length === selectedTags.size
+        && stackTags.every(tag => selectedTags.has(tag))
+    }
+        
     );
 
     state.saveNewStack.hidden =
@@ -430,6 +435,7 @@ function toLocalDateTimeValue(date) {
 
 function dateSoon(date,threshold) {
     const daysUntil = (date.getTime() - Date.now())/ (1000 * 60 * 60 * 24);
+    console.log(daysUntil);
     return (daysUntil < threshold);
 }
 

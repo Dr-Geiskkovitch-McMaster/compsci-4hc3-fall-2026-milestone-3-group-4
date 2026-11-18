@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
     <link rel="stylesheet" href="css/main.css">
 
     <script type="importmap">
@@ -16,9 +15,9 @@
     </script>
 
     <!-- Components from the @material/web UI library -->
-     <script type="module">
+    <script type="module">
         import '@material/web/all.js';
-     </script>
+    </script>
 
 </head>
 <body>
@@ -46,7 +45,43 @@
 
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
-        <p>Browse Notes</p>
+        <div class="card-list">
+            <button type="button" id="browse-view-all-btn" class="m3-card">
+                <md-ripple></md-ripple>
+                <div class="card-content">
+                    <div class="card-icon-circle">
+                        <md-icon aria-hidden="true">format_list_bulleted</md-icon>
+                    </div>
+                    <span class="card-title">View All</span>
+                </div>
+                <div class="card-stats">
+                    <div class="card-stat">
+                        <span id="browse-view-all-open" class="card-stat-value">0</span>
+                        <span class="card-stat-label">open</span>
+                    </div>
+                    <div class="card-stat">
+                        <span id="browse-view-all-total" class="card-stat-value card-stat-value--muted">0</span>
+                        <span class="card-stat-label">total</span>
+                    </div>
+                </div>
+            </button>
+            <details open class="browse-section">
+                <summary class="m3-hr">
+                    <md-icon aria-hidden="true">filter_list</md-icon>
+                    <span class="m3-hr-subtitle">Filters</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-filters-list" class="card-list"></div>
+            </details>
+            <details open class="browse-section">
+                <summary class="m3-hr">
+                    <md-icon aria-hidden="true">sell</md-icon>
+                    <span class="m3-hr-subtitle">Tags</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-tags-list" class="card-list"></div>
+            </details>
+        </div>
     </main>
 
     <!-- Agenda/create notes view -->
@@ -113,7 +148,75 @@
 
     <!-- Review view -->
     <main id="review-view" class="app-view" style="display: none;">
-        <p>Review Notes</p>
+        <section id="review-home">
+            <hr>
+            <label for="review-options">Filters</label>
+            <div id="filter-stacks" class="review-stacks">
+                <div class="stack-grid">
+                    <button id="new-stack-button" class="layer stack-button"
+                            data-stack="new-stack-button">+</button>
+                </div>
+            </div>
+            <hr>
+            <label>Tags</label>
+                <div id="tag-stacks" class="review-stacks"></div>
+            </div>
+        </section>
+        
+        <section id="active-review" hidden>
+            <div class="top-button-review">
+                <button id="exit-review" aria-label="Exit review">×</button>
+            </div>
+            <div class="review-block">
+                <label for="review-tag">Review by tag</label>
+                <div class="tag-picker">
+                    <div class="tag-input-container">
+                        <div id="selected-review-tags" class="selected-tags" aria-label="Selected tags"></div>
+                        <input
+                            id="review-tag"
+                            type="search"
+                            placeholder="Type or choose a tag"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div id="review-tag-options" class="tag-options" aria-label="Tag suggestions"></div>
+                </div>
+                <button id="save-stack" hidden>Save Filters as New Stack</button>
+                <div class="note-stack">
+                    <div class="sticky-note sticky-note--back"></div>
+                    <div class="sticky-note sticky-note--front">
+                        <p>This is a sample note.</p>
+                        <div class="note-tags" aria-label="Note tags"></div>
+                    </div>
+                </div>
+                <p class="review-feedback">Swipe the note to review it.</p>
+            </div>
+        </section>
+
+        <md-dialog id="save-stack-dialog">
+            <div slot="headline">Save new stack</div>
+            <form slot="content" id="stack-form" method="dialog">
+                <label for="stack-name">Stack Name</label>
+                <input id="stack-name" type="text">
+            </form>
+            <div slot="actions">
+                <md-text-button form="stack-form" value="cancel">Cancel</md-text-button>
+                <md-filled-button form="stack-form" value="save">Save</md-filled-button>
+            </div>
+        </md-dialog>
+
+        <md-dialog id="reminder-date-set">
+            <div slot="headline">Set reminder date</div>
+            <form slot="content" id="reminder-form" method="dialog">
+                <label for="reminder-time">Reminder date and time</label>
+                <input id="reminder-time" type="datetime-local">
+            </form>
+            <div slot="actions">
+                <md-text-button form="reminder-form" value="cancel">Cancel</md-text-button>
+                <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
+            </div>
+        </md-dialog>
+
     </main>
 
     <!-- Fab button to create notes -->
@@ -190,6 +293,18 @@
         </button>
 
     </nav>
+
+    <!-- Full-screen Special View overlay -->
+    <section id="special-view" class="special-view" hidden aria-modal="true" role="dialog">
+        <header class="special-view-header">
+            <md-icon-button id="special-view-back" aria-label="Back">
+                <md-icon>arrow_back</md-icon>
+            </md-icon-button>
+            <h1 id="special-view-title" class="special-view-title"></h1>
+            <div id="special-view-header-actions" class="special-view-header-actions"></div>
+        </header>
+        <div id="special-view-body" class="special-view-body"></div>
+    </section>
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/create.js"></script>

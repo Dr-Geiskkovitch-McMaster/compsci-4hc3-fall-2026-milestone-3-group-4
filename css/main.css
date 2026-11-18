@@ -192,8 +192,14 @@
 }
 
 .review-feedback {
+    height: 1.5em;
     margin: 20px 0 0;
     color: var(--md-sys-color-on-surface-variant);
+}
+
+.review-feedback[hidden] {
+    display: block;
+    visibility: hidden;
 }
 
 .tag-picker {

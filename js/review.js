@@ -1,4 +1,4 @@
-const swipeThreshold = 100;
+const swipeThreshold = 150;
 
 /* Hardcoded notes to show review functionality */
 export const notes = [
@@ -137,6 +137,8 @@ export function initializeReview() {
     const saveNewStackDialog = reviewView.querySelector('#save-stack-dialog');
     const newStackInput = reviewView.querySelector('#stack-name');
 
+    const swipeHint = reviewView.querySelector('.swipe-hint');
+
     if (!reviewView || !note || !feedback || !noteStack || !backNote
         || !tagSearch || !tagOptions || !selectedTagList 
         || !reminderDialog ||! reminderInput) {
@@ -172,7 +174,9 @@ export function initializeReview() {
         creatingNewStack: false,
         saveNewStack,
         newStackInput,
-        saveNewStackDialog
+        saveNewStackDialog,
+        swipeHint,
+        feedbackTimeout: undefined
     };
 
     state.transitionHandler = event => handleTransitionEnd(state, event);
@@ -238,6 +242,47 @@ export function initializeReview() {
         const touch = event.touches[0];
         state.touchIdentifier = touch.identifier;
         state.startPoint = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true });
+
+    /* event listener to hint when partial swipe is done */
+    note.addEventListener('touchmove', event => {
+        if (!state.startPoint || state.touchIdentifier === undefined) {
+            return;
+        }
+
+        const touch = Array.from(event.changedTouches)
+            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
+        if (!touch) {
+            return;
+        }
+
+        const horizontalDistance = touch.clientX - state.startPoint.x;
+        const verticalDistance = touch.clientY - state.startPoint.y;
+
+        /** determine whether touch is start of a swipe */
+        const hintThreshold = 50;
+        let direction; 
+        
+        if (Math.abs(horizontalDistance) >= Math.abs(verticalDistance)) {
+            if (Math.abs(horizontalDistance) >= hintThreshold) {
+                direction = horizontalDistance > 0 ? 'right' : 'left';
+            }
+        } else if (Math.abs(verticalDistance) >= hintThreshold) {
+            direction = verticalDistance > 0 ? 'down' : 'up';
+        }
+
+        if (!direction) {
+            state.swipeHint.hidden = true;
+            return;
+        }
+        const hints = {
+            left: 'Dismiss note',
+            right: 'Resolve note',
+            up: 'Change reminder',
+            down: 'Edit'
+        };
+
+        displayFeedbackText(state,hints[direction]);
     }, { passive: true });
 
     note.addEventListener('touchend', event => {
@@ -464,16 +509,16 @@ function dateSoon(date,threshold) {
 
 function showSwipeFeedback(state, direction, color) {
     if (direction === 'left'){
-        state.feedback.textContent = 'Note dismissed';
+        displayFeedbackText(state,'Note dismissed');
     } else if (direction === 'right'){
-        state.feedback.textContent = 'Note resolved';
+        displayFeedbackText(state,'Note resolved');
         state.noteQueue[state.noteIndex].resolved = true;
     } else if (direction === 'up') {
-        state.feedback.textContent = 'Change reminder';
+        displayFeedbackText(state,'Change reminder');
         openReminderDialog(state);
         return;
     } else if (direction == 'down'){
-        state.feedback.textContent = 'Editing note';
+        displayFeedbackText(state,'Editing note');
     }
 
     state.note.style.backgroundColor = color;
@@ -488,6 +533,17 @@ function showSwipeFeedback(state, direction, color) {
     state.note.style.transform = movement[direction];
 
     state.note.addEventListener('transitionend', state.transitionHandler);
+}
+
+function displayFeedbackText (state, message, duration = 2000){
+    clearTimeout(state.feedbackTimeout);
+
+    state.feedback.textContent = message;
+    state.feedback.hidden = false;
+
+    state.feedbackTimeout = setTimeout(() => {
+        state.feedback.hidden = true;
+    }, duration);
 }
 
 function handleTransitionEnd(state,event) {

@@ -1,9 +1,16 @@
 
+import './data.js';
+import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
+
+renderBrowseView();
 
 // Script for switching views in place using navigation bar
 const navItems = document.querySelectorAll('.nav-item');
 const views = document.querySelectorAll('.app-view');
+const topNav = document.querySelector('.top-nav-bar');
+
+let lastScrollY = window.scrollY;
 
 const topNavBar = document.querySelector('.top-nav-bar');
 const bottomNavBar = document.querySelector('.bottom-nav-bar');
@@ -28,10 +35,32 @@ navItems.forEach(item => {
     const targetView = document.getElementById(targetId);
     if (targetView) {
       targetView.style.display = 'block';
+      if (targetId === 'browse-view') {
+        renderBrowseView();
+      }
     }
   });
 });
 
+window.addEventListener('scroll', () => {
+  const currentScrollY = window.scrollY;
+  // Always show at the very top of the page (handles iOS/trackpad bounce)
+  if (currentScrollY <= 0) {
+    topNav.classList.remove('top-nav-bar--hidden');
+    lastScrollY = 0;
+    return;
+  }
+  // Ignore tiny scroll jitter
+  if (Math.abs(currentScrollY - lastScrollY) < 6) return;
+  if (currentScrollY > lastScrollY && currentScrollY > topNav.offsetHeight) {
+    // Scrolling down
+    topNav.classList.add('top-nav-bar--hidden');
+  } else {
+    // Scrolling up
+    topNav.classList.remove('top-nav-bar--hidden');
+  }
+  lastScrollY = currentScrollY;
+}, { passive: true });
 /* REVIEW CODE */
 
 /* generate stacks based on stack array */

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
     <link rel="stylesheet" href="css/main.css">
 
     <script type="importmap">
@@ -16,9 +15,9 @@
     </script>
 
     <!-- Components from the @material/web UI library -->
-     <script type="module">
+    <script type="module">
         import '@material/web/all.js';
-     </script>
+    </script>
 
 </head>
 <body>
@@ -46,7 +45,43 @@
 
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
-        <p>Browse Notes</p>
+        <div class="card-list">
+            <button type="button" id="browse-view-all-btn" class="m3-card">
+                <md-ripple></md-ripple>
+                <div class="card-content">
+                    <div class="card-icon-circle">
+                        <md-icon aria-hidden="true">format_list_bulleted</md-icon>
+                    </div>
+                    <span class="card-title">View All</span>
+                </div>
+                <div class="card-stats">
+                    <div class="card-stat">
+                        <span id="browse-view-all-open" class="card-stat-value">0</span>
+                        <span class="card-stat-label">open</span>
+                    </div>
+                    <div class="card-stat">
+                        <span id="browse-view-all-total" class="card-stat-value card-stat-value--muted">0</span>
+                        <span class="card-stat-label">total</span>
+                    </div>
+                </div>
+            </button>
+            <details open class="browse-section">
+                <summary class="m3-hr">
+                    <md-icon aria-hidden="true">filter_list</md-icon>
+                    <span class="m3-hr-subtitle">Filters</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-filters-list" class="card-list"></div>
+            </details>
+            <details open class="browse-section">
+                <summary class="m3-hr">
+                    <md-icon aria-hidden="true">sell</md-icon>
+                    <span class="m3-hr-subtitle">Tags</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-tags-list" class="card-list"></div>
+            </details>
+        </div>
     </main>
 
     <!-- Agenda/create notes view -->
@@ -157,6 +192,18 @@
         </button>
 
     </nav>
+
+    <!-- Full-screen Special View overlay -->
+    <section id="special-view" class="special-view" hidden aria-modal="true" role="dialog">
+        <header class="special-view-header">
+            <md-icon-button id="special-view-back" aria-label="Back">
+                <md-icon>arrow_back</md-icon>
+            </md-icon-button>
+            <h1 id="special-view-title" class="special-view-title"></h1>
+            <div id="special-view-header-actions" class="special-view-header-actions"></div>
+        </header>
+        <div id="special-view-body" class="special-view-body"></div>
+    </section>
 
     <script type="module" src="js/main.js"></script>
 </body>

@@ -1,4 +1,5 @@
-import appData, { getAllTags, getColorPair } from './data.js';
+import appData, { getColorPair } from './data.js';
+import { openSpecialView } from './specialView.js';
 
 function startOfDay(date) {
   const d = new Date(date);
@@ -35,12 +36,16 @@ function inDateRange(dateStr, range) {
 
   const target = parseDate(dateStr);
 
+  // Notice, this would not work for "all day" type creations, but they are
+  // not supported as of now.
+  // Static is within a non-moving window of time
   if (range.type === 'static') {
     if (range.start && target < startOfDay(parseDate(range.start))) return false;
     if (range.end && target > endOfDay(parseDate(range.end))) return false;
     return true;
   }
 
+  // Relvative is used to determine in relation to the current (i.e. next 7 days)
   if (range.type === 'relative') {
     const today = startOfDay(new Date());
     if (range.direction === 'next') {
@@ -56,6 +61,8 @@ function inDateRange(dateStr, range) {
   return true;
 }
 
+// Based on the criteria sub-structure in the filter object
+// Found in data.js > appData.filters.criteria
 export function matchesFilter(note, criteria) {
   if (!criteria) return true;
 
@@ -87,10 +94,27 @@ export function matchesFilter(note, criteria) {
   return true;
 }
 
+export function getAllTagNames() {
+  const tags = new Set();
+  for (const tag of appData.tags) {
+    tags.add(tag.name);
+  }
+  return [...tags].sort();
+}
+
+export function getTagByName(name = '') {
+  for (const tag of appData.tags) {
+    if (tag.name == name) {
+      return tag
+    }
+  }
+  return null;
+}
+
 function createBrowseCard({ title, icon, openCount, totalCount, color }) {
   const card = document.createElement('button');
   card.type = 'button';
-  card.className = 'm3-card';
+  card.className = 'm3-card m3-card--compact';
 
   const palette = getColorPair(color);
   card.style.setProperty('--card-accent', palette.accent);
@@ -98,7 +122,7 @@ function createBrowseCard({ title, icon, openCount, totalCount, color }) {
   card.innerHTML = `
     <md-ripple></md-ripple>
     <div class="card-content">
-      <div class="card-icon-circle">
+      <div class="card-icon-circle card-icon-circle--compact">
         <md-icon aria-hidden="true">${icon}</md-icon>
       </div>
       <span class="card-title"></span>
@@ -119,15 +143,92 @@ function createBrowseCard({ title, icon, openCount, totalCount, color }) {
   return card;
 }
 
+function createAddCard(ariaLabel) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'm3-card m3-card--compact m3-card--add';
+  card.setAttribute('aria-label', ariaLabel);
+  card.innerHTML = `
+    <md-ripple></md-ripple>
+    <md-icon aria-hidden="true">add</md-icon>
+  `;
+  return card;
+}
+
+function createNoteCard(note) {
+  const card = document.createElement('article');
+  card.className = 'note-preview-card';
+
+  // TODO: Add visual representation of audio beyond just text + transcript
+  const bodyText = document.createElement('p');
+  bodyText.className = 'note-preview-text';
+  bodyText.textContent =
+    note.type === 'audio' ? `AUDIO ${note.audio.transcript}` : note.text;
+  card.appendChild(bodyText);
+
+  const meta = document.createElement('div');
+  meta.className = 'note-preview-meta';
+
+  const status = document.createElement('span');
+  status.textContent = note.open ? 'Open' : 'Closed';
+  meta.appendChild(status);
+
+  if (note.dueDate) {
+    const due = document.createElement('span');
+    due.textContent = `Due ${note.dueDate}`;
+    meta.appendChild(due);
+  }
+
+  for (const tag of note.tags) {
+    const tagEl = document.createElement('span');
+    const tagObj = getTagByName(tag);
+    const palette = getColorPair(tagObj.color);
+    tagEl.style.setProperty('--tag-container', palette.container);
+    tagEl.style.setProperty('--tag-accent', palette.accent);
+    tagEl.className = 'note-preview-tag';
+    tagEl.textContent = `#${tagObj.name}`;
+    meta.appendChild(tagEl);
+  }
+
+  card.appendChild(meta);
+
+  return card;
+}
+
+function buildNotesContent(notes) {
+  if (notes.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'special-view-empty';
+    empty.textContent = 'No notes match this view.';
+    return empty;
+  }
+
+  const fragment = document.createDocumentFragment();
+  for (const note of notes) {
+    const card = createNoteCard(note);
+    fragment.appendChild(card);
+  }
+  return fragment;
+}
+
 export function renderBrowseView() {
   const activeNotes = appData.notes.filter(note => !note.deleted);
 
-  // Update pinned "View All" card counts
+  // Update pinned "View All" card counts and click handler
+  const viewAllBtn = document.getElementById('browse-view-all-btn');
   const viewAllOpen = document.getElementById('browse-view-all-open');
   const viewAllTotal = document.getElementById('browse-view-all-total');
   if (viewAllOpen && viewAllTotal) {
     viewAllOpen.textContent = activeNotes.filter(n => n.open).length;
     viewAllTotal.textContent = activeNotes.length;
+  }
+  if (viewAllBtn) {
+    viewAllBtn.onclick = () => {
+      openSpecialView({
+        title: 'View All',
+        content: buildNotesContent(activeNotes)
+      });
+    };
   }
 
   // Render Filters
@@ -144,8 +245,15 @@ export function renderBrowseView() {
         color: filter.color
       });
       card.dataset.filterId = filter.id;
+      card.addEventListener('click', () => {
+        openSpecialView({
+          title: filter.name,
+          content: buildNotesContent(matched)
+        });
+      });
       filtersList.appendChild(card);
     }
+    filtersList.appendChild(createAddCard('Create new filter'));
   }
 
   // Render Tags
@@ -153,7 +261,7 @@ export function renderBrowseView() {
   if (tagsList) {
     tagsList.replaceChildren();
     const tagMetaMap = new Map(appData.tags.map(t => [t.name, t]));
-    for (const tagName of getAllTags()) {
+    for (const tagName of getAllTagNames()) {
       const matched = activeNotes.filter(note => note.tags.includes(tagName));
       const meta = tagMetaMap.get(tagName);
       const card = createBrowseCard({
@@ -164,7 +272,14 @@ export function renderBrowseView() {
         color: meta?.color
       });
       card.dataset.tagName = tagName;
+      card.addEventListener('click', () => {
+        openSpecialView({
+          title: "#" + tagName,
+          content: buildNotesContent(matched)
+        });
+      });
       tagsList.appendChild(card);
     }
+    tagsList.appendChild(createAddCard('Create new tag'));
   }
 }

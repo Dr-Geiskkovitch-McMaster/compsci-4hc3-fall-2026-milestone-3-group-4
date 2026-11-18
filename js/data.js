@@ -340,17 +340,6 @@ window.appData = appData;
 
 export default appData;
 
-export function getAllTags() {
-  const tags = new Set();
-  for (const note of appData.notes) {
-    if (note.deleted) continue;
-    for (const tag of note.tags) {
-      tags.add(tag);
-    }
-  }
-  return [...tags].sort();
-}
-
 /**
  * Pairs bold accent colors with muted M3-style container & border colors.
  */

@@ -12,6 +12,9 @@
     --md-sys-color-filter-container: #dde8f6;
     --md-sys-color-primary: #6750A4;
     --md-sys-color-filter: #3b7dd4;
+    --md-sys-color-medium: #ab94ea;
+    --md-sys-color-light2: #c6b2e7;
+    --md-sys-color-light3: #d7c6f1;
 
     font-family: 'Roboto', sans-serif;
     --md-ref-typeface-brand: 'Roboto', sans-serif;
@@ -52,6 +55,8 @@ html::-webkit-scrollbar {
 .top-nav-bar--hidden {
     transform: translateY(-100%); 
     opacity: 0;
+.top-nav-bar.review-mode {
+    display: none;
 }
 
 .nav-button {
@@ -109,6 +114,11 @@ html::-webkit-scrollbar {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    z-index: 5;
+}
+
+.bottom-nav-bar.review-mode {
+    display: none;
 }
 
 .nav-label {
@@ -379,4 +389,203 @@ html::-webkit-scrollbar {
     font-weight: 500;
 }
 
+.nav-item.active {
+    background-color: var(--md-sys-color-light2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    gap: 4px;    
+}
 
+/* Review designs */ 
+.review-stacks{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    justify-items: center;
+    padding: 25px;
+}
+
+.stack-grid {
+  display: grid;
+  width: 35vw;
+  height: 35vw;
+  position: relative;
+  padding:10px;
+}
+
+.stack-grid .layer {
+  grid-area: 1 / 1;
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Top layer */
+.stack-button{
+  z-index: 3;
+  background-color:#f8fafc;
+}
+
+/* Middle layer */
+.stack-grid .layer-2 {
+  z-index: 2;
+  background: #f8fafc;
+  rotate: 5deg;
+}
+
+/* Bottom layer */
+.stack-grid .layer-3 {
+  z-index: 1;
+  background: #f1f5f9;
+  rotate: -5deg;
+}
+
+#new-stack-button {
+    font-size: 30px;
+}
+
+#save-stack {
+
+}
+
+.review-block{
+    display: grid;
+    place-items: center;
+    min-height: 80vh;
+}
+
+.review-feedback {
+    margin: 20px 0 0;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.tag-picker {
+    width: min(40vh, 100%);
+}
+
+.tag-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: 35px;
+    box-sizing: border-box;
+    padding: 3px 5px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 12px;
+    background: var(--md-sys-color-surface-container);
+}
+
+#review-tag {
+    flex: 1;
+    min-width: 100px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: smaller;
+}
+
+.tag-options,
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-options {
+    margin-top: 6px;
+    font-size: smaller;
+}
+
+.selected-tags:empty,
+.tag-options:empty {
+    display: none;
+}
+
+.selected-tags {
+    align-items: center;
+}
+
+.tag-option,
+.selected-tag {
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 999px;
+    padding: 6px 12px;
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+}
+
+.selected-tag {
+    background: var(--md-sys-color-primary-container);
+}
+
+.top-button-review {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+#exit-review {
+    border: none;
+    font-size: 40px;
+    font-family: 'Trebuchet MS';
+    background-color: transparent;
+}
+
+.note-stack{
+    position: relative;
+    width: min(35vh, 35vh);
+    aspect-ratio: 1;
+}
+
+.sticky-note{
+    position: absolute;
+    background-color: var(--md-sys-color-surface-container);
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    inset: 0;
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.sticky-note--back {
+    transform: translate(10px, 10px);
+    background-color: var(--md-sys-color-light3);
+}
+
+.sticky-note--front {
+    z-index: 1;
+    background-color: var(--md-sys-color-surface-container);
+    touch-action: none;
+    user-select: none;
+    transition: transform 300ms ease, background-color 200ms ease;
+    font-size: small;
+    position: relative;
+}
+
+.sticky-note--front p {
+    white-space: pre-line;
+}
+
+.note-tags {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.note-tag {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}

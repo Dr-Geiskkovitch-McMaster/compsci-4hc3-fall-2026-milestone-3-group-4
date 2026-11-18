@@ -240,6 +240,7 @@ html::-webkit-scrollbar {
     resize: none;
     background: transparent;
     box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
 }
 
 .panel-bottom {

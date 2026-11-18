@@ -14,6 +14,8 @@ const tagSearch = document.getElementById('note-tag');
 const tagOptions = document.getElementById('tag-select-options');
 const selectedTagList = document.getElementById('selected-tags');
 const selectedTags = new Set();
+// Represents tags that were selected during the current dialog session
+const sessionTags = new Set()
 const tagSelectCancel = document.getElementById('cancel-tag-selection');
 const tagSelectSave = document.getElementById('save-tag-selection');
 const tagCreateName = document.getElementById('created-tag');
@@ -125,6 +127,7 @@ function renderTagPicker() {
     chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
     chip.setAttribute('aria-label', `Remove ${tag} tag`);
     chip.addEventListener('click', () => {
+        sessionTags.delete(tag);
         selectedTags.delete(tag);
         renderTagPicker();
     });
@@ -133,25 +136,22 @@ function renderTagPicker() {
 }
 
 tagSelectCancel.addEventListener('click', () => {
+  sessionTags.forEach((item) => selectedTags.delete(item));
+  sessionTags.clear();
   tagDialog.close();
 });
 
 tagSelectSave.addEventListener('click', () => {
+  sessionTags.clear();
   tagDialog.close();
 });
 
 function selectTag(tag) {
+  sessionTags.add(tag);
   selectedTags.add(tag);
   tagSearch.value = '';
   renderTagPicker()
   tagSearch.focus()
-}
-
-function clearTags() {
-  selectedTags.clear()
-  tagSearch.value = '';
-  renderTagPicker()
-  tagSearch.focus();
 }
 
 // When user creates a tag, render it in the dialog
@@ -160,6 +160,8 @@ tagCreateButton.addEventListener('click', () => {
 
   if (userCreatedTag.length > 0) {
     selectedTags.add(userCreatedTag);
+    sessionTags.add(userCreatedTag)
+
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'selected-tag';
@@ -168,19 +170,16 @@ tagCreateButton.addEventListener('click', () => {
     chip.setAttribute('aria-label', `Remove ${userCreatedTag} tag`);
     chip.addEventListener('click', () => {
         selectedTags.delete(userCreatedTag);
+        sessionTags.delete(userCreatedTag)
         renderTagPicker();
     });
 
     tags.push(userCreatedTag);
     tagColors[userCreatedTag] = chip.backgroundColor;
     selectedTagList.append(chip);
-
-
   }
 
   tagCreateName.value = '';
-
-  // console.log(selectedTags)
 });
 
 

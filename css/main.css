@@ -741,7 +741,7 @@ html::-webkit-scrollbar {
 .sticky-note--front {
     z-index: 1;
     background-color: var(--md-sys-color-surface-container);
-    touch-action: none;
+    touch-action: pan-y;
     user-select: none;
     transition: transform 300ms ease, background-color 200ms ease;
     font-size: small;
@@ -750,6 +750,10 @@ html::-webkit-scrollbar {
 
 .sticky-note--front p {
     white-space: pre-line;
+    max-height: calc(100% - 60px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
 }
 
 .note-tags {

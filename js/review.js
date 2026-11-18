@@ -1,121 +1,33 @@
 const swipeThreshold = 150;
-
-/* Hardcoded notes to show review functionality */
-export const notes = [
-    {
-        text: "Capstone: new model fine tuning approach? Ask TA",
-        resolved: false,
-        reminder: new Date(2026, 11, 9),
-        tags: ['school', 'capstone']
-    },
-    {
-        text: "Traitors themed birthday party",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    },
-    {
-        text: "Gift for mom: long gold earrings",
-        resolved: false,
-        reminder: new Date(2026, 11, 15),
-        tags: ['home']
-    },
-    {
-        text: "Lizzy mcalpine new album favs: \n Peach \n Ugly things \n two elevens",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    },
-    {
-        text: "quinoa power bowl recipe allrecipes",
-        resolved: false,
-        reminder: new Date(2026, 10, 19),
-        tags: ['food']
-    },
-    {
-        text: "something about inventions based on ecology",
-        resolved: false,
-        reminder: new Date(2026, 11, 1),
-        tags: ['school']
-    },
-    {
-        text: "badminton\n eng volleyball \n waterpolo (x2)?\n intramural signup monday",
-        resolved: false,
-        reminder: new Date(2026, 10, 29),
-        tags: null
-    },
-    {
-        text: "the body new show to watch",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    }
-];
-
-export const stacks = [
-    {
-        name: "Open Loops",
-        tags: ['open'],
-        type: 'filter'
-    }, 
-    {
-        name: "Untagged",
-        tags: ['untagged'],
-        type: 'filter'
-    },  
-    {
-        name: "Due Soon",
-        tags: ['due'],
-        type: 'filter'
-    },  
-    {
-        name: "School",
-        tags: ['school'],
-        type: 'tag'
-    },   
-    {
-        name: "Random",
-        tags: ['random'],
-        type: 'tag'
-    },   
-    {
-        name: "Home",
-        tags: ['home'],
-        type: 'tag'
-    },   
-    {
-        name: "Capstone",
-        tags: ['capstone'],
-        type: 'tag'
-    },   
-    {
-        name: "Food",
-        tags: ['food'],
-        type: 'tag'
-    }
-];
+import appData, { getColorPair } from './data.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
-    if (!note.resolved) updatedTags.push('open');
-    if (!note.resolved && note.reminder && dateSoon(note.reminder,2)){
+    if (note.open) updatedTags.push('open');
+    if (note.open && note.dueDate && dateSoon(new Date(note.dueDate),2)){
         updatedTags.push('due');
     }
     
     return updatedTags;
 }
 
-export const tags = [...new Set([...notes.flatMap(getNoteTags), 'due'])];
-export const tagColors = {
-    school: '#DDEBFF',
-    capstone: '#E8D9FF',
-    random: '#FFE6CC',
-    home: '#D7F2DF',
-    food: '#FFF2B3',
-    untagged: '#e6e3e3',
-    open: '#e6e3e3',
-    due: '#e6e3e3'
-}
+export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
+export const stacks = [
+    { name: "Open Loops", tags: ['open'], type: 'filter', icon: 'inbox' },
+    { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
+    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
+
+    ...tags.map(tag => {
+        const tagData = appData.tags.find(item => item.name === tag);
+
+        return {
+            name: tag.charAt(0).toUpperCase() + tag.slice(1),
+            tags: [tag],
+            type: 'tag',
+            icon: tagData?.icon ?? 'label'
+        };
+    })
+];
 
 
 export function initializeReview() {
@@ -147,9 +59,10 @@ export function initializeReview() {
 
     const noteText = note.querySelector('p');
     const noteTags = note.querySelector('.note-tags');
+    const noteDueDate = note.querySelector('.note-due-date');
 
-    if (!noteText || !noteTags) {
-        throw new Error('Review note is missing its text or tags element.');
+    if (!noteText || !noteTags || !noteDueDate ) {
+        throw new Error('Review note is missing its text, tags, or due date element.');
     }
     
     const state = {
@@ -158,12 +71,13 @@ export function initializeReview() {
         noteStack,
         backNote,
         noteTags,
+        noteDueDate,
         feedback,
         reviewView,
         tagSearch,
         tagOptions,
         selectedTagList,
-        noteQueue: notes,
+        noteQueue: appData.notes,
         selectedTags: new Set(),
         startPoint: undefined,
         touchIdentifier: undefined,
@@ -328,7 +242,7 @@ export function initializeReview() {
         const newStack = {
             name: state.newStackInput.value,
             tags: [...state.selectedTags],
-            type: 'custom'
+            type: 'filter'
         } 
 
         stacks.push(newStack);
@@ -360,9 +274,14 @@ export function initializeReview() {
 
 /* save button is only visible when stack with selected tags doesn't already exist */
 function updateSaveButtonVisibility(state) {
-    const stackAlreadyExists = stacks.some(stack =>
-        stack.tags.length === state.selectedTags.size
-        && stack.tags.every(tag => state.selectedTags.has(tag))
+    const selectedTags = new Set([...state.selectedTags].filter(tag => tag !== 'open'));
+    const stackAlreadyExists = stacks.some(stack => {
+        const stackTags = stack.tags.filter(tag => tag !== 'open');
+
+        return stackTags.length === selectedTags.size
+        && stackTags.every(tag => selectedTags.has(tag))
+    }
+        
     );
 
     state.saveNewStack.hidden =
@@ -371,7 +290,7 @@ function updateSaveButtonVisibility(state) {
 
 /* count notes in stack for ui */
 function countStackNotes(stack) {
-    return notes.filter(note =>
+    return appData.notes.filter(note =>
         !note.resolved && stack.tags.some(tag => getNoteTags(note).includes(tag))
     ).length;
 }
@@ -398,18 +317,24 @@ function showCurrentNote(state) {
 
     state.noteStack.hidden = false;
     const currentNote = state.noteQueue[state.noteIndex];
-    state.noteText.textContent = currentNote.text;
+    state.noteText.textContent = currentNote.text ? currentNote.text : `AUDIO: ${currentNote.audio.transcript}`;
     state.noteTags.replaceChildren();
     /** draw tags on the note */
     (getNoteTags(currentNote) ?? []).forEach(tag => {
         if (tag !== 'untagged' && tag !== 'open' && tag !== 'due'){
             const chip = document.createElement('span');
+            const tagData = appData.tags.find(item => item.name === tag);
+            const palette = getColorPair(tagData.color);
             chip.className = 'note-tag';
-            chip.textContent = tag;
-            chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+            chip.textContent = tagData.name;
+            chip.style.backgroundColor = palette.container;
+            chip.style.color = palette.accent;
             state.noteTags.append(chip);
         }
     });
+    // draw due date on the note
+    state.noteDueDate.textContent = currentNote.dueDate ? `Due ${currentNote.dueDate}` : '';
+    
     state.backNote.hidden = state.noteQueue.slice(state.noteIndex + 1)
         .every(queuedNote => queuedNote.resolved);
 }
@@ -417,11 +342,11 @@ function showCurrentNote(state) {
 /** update queue for when tags are selected */
 function updateNoteQueue(state) {
     if (state.selectedTags.size > 0) {
-        state.noteQueue = notes.filter (note =>
+        state.noteQueue = appData.notes.filter (note =>
             getNoteTags(note).some(tag => state.selectedTags.has(tag))
         );
     } else {
-        state.noteQueue = state.creatingNewStack ? [] : notes;
+        state.noteQueue = state.creatingNewStack ? [] : appData.notes;
     }
 
     state.noteIndex = 0;
@@ -458,8 +383,11 @@ function renderTagPicker(state) {
     state.tagOptions.replaceChildren();
     matchingTags.forEach(tag => {
         const option = document.createElement('button');
+        const tagData = appData.tags.find(item => item.name === tag);
+        const palette = getColorPair(tagData?.color);
         option.type = 'button';
-        option.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        option.style.backgroundColor = palette?.container ?? '#E5E5E5';
+        option.style.color = palette?.accent ?? '#000000';
         option.className = 'tag-option';
         option.textContent = tag;
         option.addEventListener('click', () => {
@@ -472,10 +400,13 @@ function renderTagPicker(state) {
     state.selectedTagList.replaceChildren();
     state.selectedTags.forEach(tag => {
         const chip = document.createElement('button');
+        const tagData = appData.tags.find(item => item.name === tag);
+        const palette = getColorPair(tagData?.color);
         chip.type = 'button';
         chip.className = 'selected-tag';
         chip.textContent = `${tag} ×`;
-        chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+        chip.style.color = palette.accent;
         chip.setAttribute('aria-label', `Remove ${tag} tag`);
         chip.addEventListener('click', () => {
             state.selectedTags.delete(tag);
@@ -504,6 +435,7 @@ function toLocalDateTimeValue(date) {
 
 function dateSoon(date,threshold) {
     const daysUntil = (date.getTime() - Date.now())/ (1000 * 60 * 60 * 24);
+    console.log(daysUntil);
     return (daysUntil < threshold);
 }
 

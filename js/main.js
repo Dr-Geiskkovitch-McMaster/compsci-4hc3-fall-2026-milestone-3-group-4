@@ -1,5 +1,5 @@
 
-import './data.js';
+import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
 
@@ -70,7 +70,21 @@ function renderStacks(stack) {
 
   const button = document.createElement('button');
   button.className = 'layer stack-button';
-  button.textContent = stack.name;
+  const icon = document.createElement('md-icon');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = stack.icon ?? 'label';
+  // stack icon can be first tag
+  const tagData = appData.tags.find(item => 
+    item.name === stack.tags[0]
+  );
+
+  const palette = getColorPair(tagData?.color);
+  icon.style.color = palette.accent;
+
+  const label = document.createElement('span');
+  label.textContent = stack.name;
+
+  button.replaceChildren(icon, label);
   button.addEventListener('click', () => openStack(stack));
 
   grid.append(button);

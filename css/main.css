@@ -547,17 +547,6 @@ html::-webkit-scrollbar {
     font-weight: 500;
 }
 
-/* .nav-item.active {
-    background-color: var(--md-sys-color-light2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    height: 100%;
-    gap: 4px;    
-} */
-
 /* Review designs */ 
 .review-stacks{
     display: grid;
@@ -598,22 +587,31 @@ html::-webkit-scrollbar {
 
 /* Top layer */
 .stack-button{
-  z-index: 3;
-  background-color:#f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 3;
+    background-color:#f8fafc;
+}
+
+.stack-button md-icon {
+    --md-icon-size: 7vw;
 }
 
 /* Middle layer */
 .stack-grid .layer-2 {
-  z-index: 2;
-  background: #f8fafc;
-  rotate: 5deg;
+    z-index: 2;
+    background: #f8fafc;
+    rotate: 5deg;
 }
 
 /* Bottom layer */
 .stack-grid .layer-3 {
-  z-index: 1;
-  background: #f1f5f9;
-  rotate: -5deg;
+    z-index: 1;
+    background: #f1f5f9;
+    rotate: -5deg;
 }
 
 #new-stack-button {
@@ -662,6 +660,12 @@ html::-webkit-scrollbar {
     background: transparent;
     font: inherit;
     font-size: smaller;
+}
+
+.note-due-date {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
 }
 
 .tag-options,
@@ -737,7 +741,7 @@ html::-webkit-scrollbar {
 .sticky-note--front {
     z-index: 1;
     background-color: var(--md-sys-color-surface-container);
-    touch-action: none;
+    touch-action: pan-y;
     user-select: none;
     transition: transform 300ms ease, background-color 200ms ease;
     font-size: small;
@@ -746,6 +750,10 @@ html::-webkit-scrollbar {
 
 .sticky-note--front p {
     white-space: pre-line;
+    max-height: calc(100% - 60px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
 }
 
 .note-tags {

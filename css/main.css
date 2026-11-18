@@ -22,8 +22,16 @@ body {
     margin: 0;
 }
 
+html {
+    scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar {
+    display: none; /* Chrome, Edge, Safari */
+}
+
 .app-view {
-    margin: 0 16px 70px;
+    margin: 0 16px 86px;
 }
 
 .top-nav-bar {
@@ -149,10 +157,14 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    width: 100%;
     padding: 16px;
     border-radius: 16px;
-    background-color: var(--md-sys-color-surface-container-low, #f7f2fa);
-    border: 1px solid var(--md-sys-color-outline-variant);
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    font: inherit;
+    text-align: left;
     cursor: pointer;
     overflow: hidden;
 }
@@ -179,7 +191,7 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background-color: var(--md-sys-color-primary);
+    background-color: var(--card-accent, var(--md-sys-color-primary));
     color: white;
     display: flex;
     align-items: center;
@@ -213,11 +225,18 @@ body {
 
 .m3-card-hr {
     border-top: 1px solid var(--md-sys-color-on-surface-variant);
-    margin: 2em 8px 0.5em;
+    margin: 1.5em 8px 0.75em;
     display: flex;
     align-items: center;
     gap: 16px;
     padding-top: 12px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.m3-card-hr::-webkit-details-marker {
+    display: none;
 }
 
 .m3-card-hr > md-icon {
@@ -229,7 +248,17 @@ body {
 .m3-card-hr-subtitle {
     font-size: 16px;
     font-weight: 700;
-    color: var(--md-sys-color-on-surface-variant)
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.browse-section-chevron {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+    transform: rotate(-90deg);
+}
+
+.browse-section[open] .browse-section-chevron {
+    transform: rotate(0deg);
 }
 
 

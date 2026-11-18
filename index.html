@@ -46,75 +46,41 @@
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
         <div class="card-list">
-            <div class="m3-card">
+            <button type="button" class="m3-card">
                 <md-ripple></md-ripple>
                 <div class="card-content">
                     <div class="card-icon-circle">
-                        <md-icon>format_list_bulleted</md-icon>
+                        <md-icon aria-hidden="true">format_list_bulleted</md-icon>
                     </div>
                     <span class="card-title">View All</span>
                 </div>
                 <div class="card-stats">
                     <div class="card-stat">
-                        <span class="card-stat-value">12</span>
+                        <span id="browse-view-all-open" class="card-stat-value">0</span>
                         <span class="card-stat-label">open</span>
                     </div>
                     <div class="card-stat">
-                        <span class="card-stat-value card-stat-value--muted">72</span>
+                        <span id="browse-view-all-total" class="card-stat-value card-stat-value--muted">0</span>
                         <span class="card-stat-label">total</span>
                     </div>
                 </div>
-            </div>
-            <div class="m3-card-hr">
-                <md-icon>filter_list</md-icon> <!--TODO: Set this icon to be filter icon-->
-                <div class="m3-card-hr-subtitle">
-                    Filters
-                </div>
-            </div>
-            <div class="m3-card">
-                <md-ripple></md-ripple>
-                <div class="card-content">
-                    <div class="card-icon-circle">
-                        <md-icon>track_changes</md-icon>
-                    </div>
-                    <span class="card-title">Due This Week</span>
-                </div>
-                <div class="card-stats">
-                    <div class="card-stat">
-                        <span class="card-stat-value">4</span>
-                        <span class="card-stat-label">open</span>
-                    </div>
-                    <div class="card-stat">
-                        <span class="card-stat-value card-stat-value--muted">12</span>
-                        <span class="card-stat-label">total</span>
-                    </div>
-                </div>
-            </div>
-            <div class="m3-card-hr">
-                <md-icon>sell</md-icon> <!--TODO: Set this icon to be filter icon-->
-                <div class="m3-card-hr-subtitle">
-                    Tags
-                </div>
-            </div>
-            <div class="m3-card">
-                <md-ripple></md-ripple>
-                <div class="card-content">
-                    <div class="card-icon-circle">
-                        <md-icon>track_changes</md-icon>
-                    </div>
-                    <span class="card-title">Due This Week</span>
-                </div>
-                <div class="card-stats">
-                    <div class="card-stat">
-                        <span class="card-stat-value">4</span>
-                        <span class="card-stat-label">open</span>
-                    </div>
-                    <div class="card-stat">
-                        <span class="card-stat-value card-stat-value--muted">12</span>
-                        <span class="card-stat-label">total</span>
-                    </div>
-                </div>
-            </div>
+            </button>
+            <details open class="browse-section">
+                <summary class="m3-card-hr">
+                    <md-icon aria-hidden="true">filter_list</md-icon>
+                    <span class="m3-card-hr-subtitle">Filters</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-filters-list" class="card-list"></div>
+            </details>
+            <details open class="browse-section">
+                <summary class="m3-card-hr">
+                    <md-icon aria-hidden="true">sell</md-icon>
+                    <span class="m3-card-hr-subtitle">Tags</span>
+                    <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
+                </summary>
+                <div id="browse-tags-list" class="card-list"></div>
+            </details>
         </div>
     </main>
 

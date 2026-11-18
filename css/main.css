@@ -55,6 +55,7 @@ html::-webkit-scrollbar {
 .top-nav-bar--hidden {
     transform: translateY(-100%); 
     opacity: 0;
+}
 .top-nav-bar.review-mode {
     display: none;
 }
@@ -97,7 +98,7 @@ html::-webkit-scrollbar {
 
 .title-label-small {
     font-family: var(--md-ref-typeface-brand);
-    font-size: 14pxs
+    font-size: 14px;
 }
 
 .section-group h1.title-label-small {
@@ -153,9 +154,9 @@ html::-webkit-scrollbar {
     background: var(--md-sys-color-primary-container-hover);
 }
 
-.nav-item.active {
+/* .nav-item.active {
     color: var(--md-sys-color-primary);
-}
+} */
 
 .nav-item.active md-icon {
     background-color: var(--md-sys-color-primary-container);
@@ -389,7 +390,7 @@ html::-webkit-scrollbar {
     font-weight: 500;
 }
 
-.nav-item.active {
+/* .nav-item.active {
     background-color: var(--md-sys-color-light2);
     display: flex;
     flex-direction: column;
@@ -398,7 +399,7 @@ html::-webkit-scrollbar {
     flex: 1;
     height: 100%;
     gap: 4px;    
-}
+} */
 
 /* Review designs */ 
 .review-stacks{

@@ -17,7 +17,9 @@ export const stacks = [
     { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
     { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
 
-    ...tags.map(tag => {
+    ...tags
+        .filter(tag => tag !== 'open' && tag !== 'due')
+        .map(tag => {
         const tagData = appData.tags.find(item => item.name === tag);
 
         return {

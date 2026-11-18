@@ -13,15 +13,20 @@ function getNoteTags(note) {
 
 export const tags = [...new Set([...appData.notes.flatMap(getNoteTags), 'due'])];
 export const stacks = [
-    { name: "Open Loops", tags: ['open'], type: 'filter' },
-    { name: "Untagged", tags: ['untagged'], type: 'filter' },
-    { name: "Due Soon", tags: ['due'], type: 'filter' },
+    { name: "Open Loops", tags: ['open'], type: 'filter', icon: 'inbox' },
+    { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
+    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
 
-    ...tags.map(tag => ({
-        name: tag.charAt(0).toUpperCase() + tag.slice(1),
-        tags: [tag],
-        type: 'tag'
-    }))
+    ...tags.map(tag => {
+        const tagData = appData.tags.find(item => item.name === tag);
+
+        return {
+            name: tag.charAt(0).toUpperCase() + tag.slice(1),
+            tags: [tag],
+            type: 'tag',
+            icon: tagData?.icon ?? 'label'
+        };
+    })
 ];
 
 

@@ -587,22 +587,31 @@ html::-webkit-scrollbar {
 
 /* Top layer */
 .stack-button{
-  z-index: 3;
-  background-color:#f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 3;
+    background-color:#f8fafc;
+}
+
+.stack-button md-icon {
+    --md-icon-size: 7vw;
 }
 
 /* Middle layer */
 .stack-grid .layer-2 {
-  z-index: 2;
-  background: #f8fafc;
-  rotate: 5deg;
+    z-index: 2;
+    background: #f8fafc;
+    rotate: 5deg;
 }
 
 /* Bottom layer */
 .stack-grid .layer-3 {
-  z-index: 1;
-  background: #f1f5f9;
-  rotate: -5deg;
+    z-index: 1;
+    background: #f1f5f9;
+    rotate: -5deg;
 }
 
 #new-stack-button {

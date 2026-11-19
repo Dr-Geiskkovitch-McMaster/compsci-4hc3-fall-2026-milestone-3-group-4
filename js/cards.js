@@ -69,7 +69,7 @@ function formatDeadlineBadge(dueDateStr) {
   };
 }
 
-export function createNoteCard(note, maxTextHeight = '6.5em', whenClicked = () =>  {}) {
+export function createNoteCard(note, maxTextHeight = '6.5em') {
   const card = document.createElement('article');
   card.className = 'note-preview-card';
 
@@ -148,15 +148,21 @@ export function createNoteCard(note, maxTextHeight = '6.5em', whenClicked = () =
     card.appendChild(badge);
   }
 
-  card.onclick = whenClicked;
-
+  card.addEventListener('click', () => {
+    document.dispatchEvent(
+      new CustomEvent('note-edit-requested', { detail: {
+        note,
+        onSave: () => card.replaceWith(createNoteCard(note, maxTextHeight))
+      } })
+    );
+  });
   return card;
 }
 
-export function createAgendaCard(note, todayKey, whenClicked = () =>  {}) {
+export function createAgendaCard(note, todayKey) {
   const isOverdue = Boolean(note.dueDate && note.dueDate < todayKey && note.open);
 
-  const card = createNoteCard(note, whenClicked);
+  const card = createNoteCard(note);
 
   return card;
 }

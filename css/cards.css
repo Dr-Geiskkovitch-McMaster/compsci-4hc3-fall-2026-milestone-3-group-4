@@ -132,6 +132,10 @@
     color: #1D1B20;
 }
 
+.m3-card--compact .card-title {
+    font-size: 16px;
+}
+
 .card-stat-value {
     font-size: 15px;
     font-weight: 600;
@@ -160,6 +164,11 @@
     cursor: pointer;
     list-style: none;
     user-select: none;
+}
+
+.m3-hr--first {
+    border-top: none;
+    margin-top: 0;
 }
 
 .m3-hr::-webkit-details-marker {

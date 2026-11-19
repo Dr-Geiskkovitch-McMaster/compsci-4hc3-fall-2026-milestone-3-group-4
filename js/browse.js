@@ -3,13 +3,13 @@ import { openSpecialView } from './specialView.js';
 import { createAddCard, createBrowseCard, createNoteCard } from './cards.js'
 import { matchesFilter } from './filters.js';
 
-function buildNotesSection(title, iconName, notes, header = true) {
+function buildNotesSection(title, iconName, notes, header = true, first = false) {
   const details = document.createElement('details');
   details.open = true;
   details.className = 'browse-section';
 
   const summary = document.createElement('summary');
-  summary.className = 'm3-hr';
+  summary.className = first ? 'm3-hr m3-hr--first' : 'm3-hr';
 
   const icon = document.createElement('md-icon');
   icon.setAttribute('aria-hidden', 'true');
@@ -56,12 +56,45 @@ function buildNotesContent(notes) {
 
   const fragment = document.createDocumentFragment();
   if (pinnedNotes.length > 0) {
-    fragment.appendChild(buildNotesSection('Pinned', 'push_pin', pinnedNotes));
+    fragment.appendChild(buildNotesSection('Pinned', 'push_pin', pinnedNotes, true, true));
   }
   if (unpinnedNotes.length > 0) {
     fragment.appendChild(buildNotesSection('Unpinned', 'notes', unpinnedNotes, atLeastOnePinned));
   }
   return fragment;
+}
+
+function createHeaderActionButton(iconName, label, feature, context) {
+  const btn = document.createElement('md-icon-button');
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+
+  const icon = document.createElement('md-icon');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = iconName;
+
+  btn.appendChild(icon);
+  btn.addEventListener('click', () => {
+    window.showPrototypeModal(feature, context);
+  });
+  return btn;
+}
+
+function buildBrowseHeaderActions() {
+  return [
+    createHeaderActionButton(
+      'filter_alt',
+      'Filter notes',
+      'Filter Notes',
+      'This would allow users to apply additional filter criteria within the current Browse list.'
+    ),
+    createHeaderActionButton(
+      'workspaces',
+      'Group notes by',
+      'Group By',
+      'This would allow users to group notes by tag, due date, status, or creation date.'
+    )
+  ];
 }
 
 export function renderBrowseView() {
@@ -79,6 +112,7 @@ export function renderBrowseView() {
     viewAllBtn.onclick = () => {
       openSpecialView({
         title: 'View All',
+        headerActions: buildBrowseHeaderActions(),
         content: buildNotesContent(activeNotes)
       });
     };
@@ -102,6 +136,7 @@ export function renderBrowseView() {
       card.addEventListener('click', () => {
         openSpecialView({
           title: filter.name,
+          headerActions: buildBrowseHeaderActions(),
           content: buildNotesContent(matched)
         });
       });
@@ -139,6 +174,7 @@ export function renderBrowseView() {
       card.addEventListener('click', () => {
         openSpecialView({
           title: "#" + tagName,
+          headerActions: buildBrowseHeaderActions(),
           content: buildNotesContent(matched)
         });
       });

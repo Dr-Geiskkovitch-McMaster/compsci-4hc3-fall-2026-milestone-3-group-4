@@ -72,18 +72,27 @@ function renderStacks(stack) {
 
   const button = document.createElement('button');
   button.className = 'layer stack-button';
-  const icon = document.createElement('md-icon');
-  icon.setAttribute('aria-hidden', 'true');
-  icon.textContent = stack.icon ?? 'label';
+  const icon = stack.iconClass
+  ? Object.assign(document.createElement('span'), {
+      className: `note-preview-status-icon ${stack.iconClass}`,
+    })
+  : document.createElement('md-icon');
+
+  if (!stack.iconClass) {
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = stack.icon ?? 'label';
+  }
   // stack icon can be first tag
   const tagData = appData.tags.find(item => 
     item.name === stack.tags[0]
   );
 
   const palette = getColorPair(tagData?.color);
-  icon.style.color = palette.accent;
-
+  if (!stack.iconClass) {
+    icon.style.color = palette.accent;
+  }
   const label = document.createElement('span');
+  
   label.textContent = stack.name;
 
   button.replaceChildren(icon, label);

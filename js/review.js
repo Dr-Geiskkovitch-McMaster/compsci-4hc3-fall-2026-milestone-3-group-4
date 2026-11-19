@@ -13,7 +13,7 @@ function getNoteTags(note) {
 
 export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
 export const stacks = [
-    { name: "Open Loops", tags: ['open'], type: 'filter', icon: 'inbox' },
+    { name: "Open Loops", tags: ['open'], type: 'filter', iconClass: 'note-preview-status-icon--open' },
     { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
     { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
 
@@ -173,34 +173,24 @@ export function initializeReview() {
         updateNoteQueue(state);
     });
 
-    note.addEventListener('touchstart', event => {
-        if (event.touches.length !== 1) {
-            state.startPoint = undefined;
-            state.touchIdentifier = undefined;
-            return;
-        }
+    note.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
 
-        const touch = event.touches[0];
-        state.touchIdentifier = touch.identifier;
-        state.startPoint = { x: touch.clientX, y: touch.clientY };
-    }, { passive: true });
+        state.pointerId = event.pointerId;
+        state.startPoint = { x: event.clientX, y: event.clientY };
+        note.setPointerCapture(event.pointerId);
+    });
 
     /* event listener to hint when partial swipe is done */
-    note.addEventListener('touchmove', event => {
-        if (!state.startPoint || state.touchIdentifier === undefined) {
+    note.addEventListener('pointermove', event => {
+        if (event.pointerId !== state.pointerId || !state.startPoint ) {
             return;
         }
 
-        const touch = Array.from(event.changedTouches)
-            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
-        if (!touch) {
-            return;
-        }
+        const horizontalDistance = event.clientX - state.startPoint.x;
+        const verticalDistance = event.clientY - state.startPoint.y;
 
-        const horizontalDistance = touch.clientX - state.startPoint.x;
-        const verticalDistance = touch.clientY - state.startPoint.y;
-
-        /** determine whether touch is start of a swipe */
+        /** determine whether click is start of a swipe */
         const hintThreshold = 50;
         let direction; 
         
@@ -213,7 +203,8 @@ export function initializeReview() {
         }
 
         if (!direction) {
-            state.swipeHint.hidden = true;
+            state.feedback.textContent = 'Swipe the note to action it.';
+            state.feedback.hidden = false;
             return;
         }
         const hints = {
@@ -226,24 +217,18 @@ export function initializeReview() {
         displayFeedbackText(state,hints[direction]);
     }, { passive: true });
 
-    note.addEventListener('touchend', event => {
-        if (!state.startPoint || state.touchIdentifier === undefined) {
+    note.addEventListener('pointerup', event => {
+        if (event.pointerId !== state.pointerId || !state.startPoint ) {
             return;
         }
 
-        const touch = Array.from(event.changedTouches)
-            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
-        if (!touch) {
-            return;
-        }
-
-        const horizontalDistance = touch.clientX - state.startPoint.x;
-        const verticalDistance = touch.clientY - state.startPoint.y;
+        const horizontalDistance = event.clientX - state.startPoint.x;
+        const verticalDistance = event.clientY - state.startPoint.y;
 
         state.startPoint = undefined;
-        state.touchIdentifier = undefined;
+        state.pointerId = undefined;
 
-        /** determine whether touch warrants a swipe */
+        /** determine whether click warrants a swipe */
         if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)
             && Math.abs(horizontalDistance) > swipeThreshold) {
             swipeActions[horizontalDistance > 0 ? 'right' : 'left']();
@@ -252,9 +237,9 @@ export function initializeReview() {
         }
     }, { passive: true });
 
-    note.addEventListener('touchcancel', () => {
+    note.addEventListener('pointercancel', () => {
         state.startPoint = undefined;
-        state.touchIdentifier = undefined;
+        state.pointerId = undefined;
     });
 
     state.saveNewStack.addEventListener('click', () => {
@@ -504,7 +489,8 @@ function displayFeedbackText (state, message, duration = 2000){
     state.feedback.hidden = false;
 
     state.feedbackTimeout = setTimeout(() => {
-        state.feedback.hidden = true;
+        state.feedback.textContent = 'Swipe the note to action it.';
+        state.feedback.hidden = false;
     }, duration);
 }
 

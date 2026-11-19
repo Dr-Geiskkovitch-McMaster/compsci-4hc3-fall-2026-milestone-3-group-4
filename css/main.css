@@ -404,6 +404,7 @@ html::-webkit-scrollbar {
     display: grid;
     place-items: center;
     min-height: 80vh;
+    padding-top: 72px;
 }
 
 .reminder-form {
@@ -521,6 +522,11 @@ html::-webkit-scrollbar {
     position: fixed;
     top: 20px;
     right: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 2;
 }
 
 #exit-review {
@@ -555,7 +561,7 @@ html::-webkit-scrollbar {
 .sticky-note--front {
     z-index: 1;
     background-color: var(--md-sys-color-surface-container);
-    touch-action: pan-y;
+    touch-action: none;
     user-select: none;
     transition: transform 300ms ease, background-color 200ms ease;
     font-size: small;
@@ -611,4 +617,13 @@ html::-webkit-scrollbar {
     height: 10px;
     border-radius: 50%;
     background-color: var(--md-sys-color-primary);
+}
+
+.stack-button .note-preview-status-icon {
+    width: 7vw;
+    height: 7vw;
+}
+
+label[for="review-tag"] {
+    font-size: 1.25rem;
 }

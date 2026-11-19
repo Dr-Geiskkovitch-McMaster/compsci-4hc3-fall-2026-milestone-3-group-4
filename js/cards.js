@@ -1,4 +1,5 @@
 import appData, { getColorPair, getAllTagNames, getTagByName } from "./data.js";
+import { openNoteEditor } from "./create.js";
 
 export function createBrowseCard({ title, icon, openCount, totalCount, color }) {
   const card = document.createElement('button');
@@ -147,6 +148,14 @@ export function createNoteCard(note, maxTextHeight = '6.5em') {
     card.appendChild(badge);
   }
 
+  card.addEventListener('click', () => {
+    document.dispatchEvent(
+      new CustomEvent('note-edit-requested', { detail: {
+        note,
+        onSave: () => card.replaceWith(createNoteCard(note, maxTextHeight))
+      } })
+    );
+  });
   return card;
 }
 

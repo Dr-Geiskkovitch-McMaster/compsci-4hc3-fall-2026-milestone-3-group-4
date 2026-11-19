@@ -27,6 +27,9 @@ const tagCreateButton = document.getElementById('create-tag-button');
 
 export const tags = [...new Set([...appData.tags])];
 
+let editingNote = null;
+let saveCallback = null;
+
 renderAgendaView();
 
 function resetTextArea(){
@@ -142,6 +145,7 @@ function renderTagPicker() {
 
   });
 
+
   // render each selected tag
   selectedTagList.replaceChildren();
   selectedTags.forEach(tag => {
@@ -162,6 +166,40 @@ function renderTagPicker() {
     selectedTagList.append(chip);
   });
 }
+
+// function to openNoteEditor, reusable by other screens
+export function openNoteEditor(note = null, onSave){
+  if (!note){
+    panel.classList.remove('hidden');
+    textareaBackdrop.classList.remove('hidden');
+    fab.classList.add('hidden');
+
+    // remove any existing text or tags when new note created
+    resetTextArea();
+    // render the tags for the current note at the bottom of the text area
+    renderTextAreaTags();
+    textarea.focus();
+  } else {
+    // used by other views, when note submitted
+    panel.classList.remove('hidden');
+    panel.classList.add('fullscreen');
+    textareaBackdrop.classList.remove('hidden');
+    fab.classList.add('hidden');
+    editingNote = note;
+    saveCallback = onSave;
+
+    textarea.value = note.text ?? `AUDIO: ${note.audio.transcript}`;
+    note.tags?.forEach(tag => selectedTags.add(tag));
+    renderTextAreaTags();
+    
+    textarea.focus();
+  }
+}
+
+// listener for note creation from other screens
+document.addEventListener('note-edit-requested', event => {
+  openNoteEditor(event.detail.note, event.detail.onSave);
+});
 
 tagSelectCancel.addEventListener('click', () => {
   sessionTags.forEach((item) => selectedTags.delete(item));
@@ -225,6 +263,19 @@ submitButton.addEventListener('click', () => {
 
   const text = textarea.value.trim();
   if (!text) return;
+
+  if (editingNote) {
+    editingNote.text = text;
+    editingNote.tags = [...selectedTags];
+    editingNote.lastModifiedAt = new Date().toISOString;
+
+    renderAgendaView();
+    renderBrowseView();
+    textarea.value = "";
+    closePanel();
+    saveCallback?.();
+    return;
+  }
 
   const now = new Date().toISOString();
   appData.notes.unshift({

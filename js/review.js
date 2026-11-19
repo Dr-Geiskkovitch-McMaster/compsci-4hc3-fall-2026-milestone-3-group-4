@@ -1,4 +1,5 @@
 const swipeThreshold = 150;
+import { openNoteEditor } from './create.js';
 import appData, { getColorPair } from './data.js';
 
 function getNoteTags(note) {
@@ -466,6 +467,9 @@ function showSwipeFeedback(state, direction, color) {
         return;
     } else if (direction == 'down'){
         displayFeedbackText(state,'Editing note');
+        openNoteEditor(state.noteQueue[state.noteIndex],
+            () => updateNoteQueue(state));
+        return;
     }
 
     state.note.style.backgroundColor = color;

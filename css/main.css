@@ -339,7 +339,7 @@ html::-webkit-scrollbar {
 .special-view {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: 50;
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -368,7 +368,12 @@ html::-webkit-scrollbar {
 
 .special-view-title {
     margin: 0;
-    font-size: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
     font-weight: 500;
     color: #1D1B20;
 }
@@ -658,4 +663,21 @@ html::-webkit-scrollbar {
 
 label[for="review-tag"] {
     font-size: 1.25rem;
+}
+
+#browse-view-all-btn {
+    margin-top: 2em;
+}
+
+.special-view-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.scrim {
+    z-index: 100;
 }

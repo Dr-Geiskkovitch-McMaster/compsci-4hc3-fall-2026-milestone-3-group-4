@@ -12,11 +12,12 @@ function getElements() {
 }
 
 export function closeSpecialView() {
-  const { container, body, fab } = getElements();
+  const { container, headerActions, body, fab } = getElements();
   if (!container || container.hidden) return;
 
   container.hidden = true;
   fab?.classList.remove('hidden');
+  if (headerActions) headerActions.replaceChildren();
   if (body) body.replaceChildren();
 
   const onClose = activeOnClose;
@@ -39,6 +40,7 @@ export function openSpecialView({ title = '', headerActions = '', content = '', 
   if (!container || !titleElement || !body) return;
 
   titleElement.textContent = title;
+  if (headerActionsContainer) headerActionsContainer.replaceChildren();
   body.replaceChildren();
 
   //Allow flexible inputs to header actions

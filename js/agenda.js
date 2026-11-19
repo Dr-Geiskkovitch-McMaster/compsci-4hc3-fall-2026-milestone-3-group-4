@@ -1,5 +1,5 @@
 import appData from './data.js';
-import { createAgendaCard } from './cards.js';
+import { createAddCard, createAgendaCard } from './cards.js';
 
 const DAYS_BEFORE = 20;
 const DAYS_AFTER = 20;
@@ -39,7 +39,11 @@ function buildDayMap(notes) {
 function createDaySection(offset, date, notes, todayKey) {
   const section = document.createElement('div');
   section.className = 'agenda-day card-list';
-  if (offset === 0) section.id = 'agenda-today';
+
+  const today = offset === 0;
+  const now = new Date();
+
+  if (today) section.id = 'agenda-today';
 
   const divider = document.createElement('md-divider');
   const heading = document.createElement('h1');
@@ -48,9 +52,24 @@ function createDaySection(offset, date, notes, todayKey) {
 
   section.append(divider, heading);
 
+  let cursorToBePlaced = today;
+
   for (const note of notes) {
+    if (cursorToBePlaced && new Date(note.createdAt) >= now) {
+        const cursor = document.createElement('div')
+        cursor.className = 'today-time-cursor'
+        section.appendChild(cursor)
+        cursorToBePlaced = false;
+    }
     section.appendChild(createAgendaCard(note, todayKey));
   }
+
+  if (cursorToBePlaced) {
+        const cursor = document.createElement('div')
+        cursor.className = 'today-time-cursor'
+        section.appendChild(cursor)
+        cursorToBePlaced = false;
+    }
 
   return section;
 }
@@ -69,6 +88,7 @@ export function renderAgendaView() {
     date.setDate(today.getDate() + offset);
     const key = toDateKey(date);
     const notesForDay = dayMap.get(key) ?? [];
+    if (offset !== 0 && notesForDay.length === 0) continue;
     fragment.appendChild(createDaySection(offset, date, notesForDay, todayKey));
   }
 

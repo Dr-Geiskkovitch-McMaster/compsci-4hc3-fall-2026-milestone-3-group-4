@@ -61,7 +61,13 @@ export function renderBrowseView() {
       });
       filtersList.appendChild(card);
     }
-    filtersList.appendChild(createAddCard('Create new filter'));
+    filtersList.appendChild(
+      createAddCard('Create new filter', () => {
+        window.showPrototypeModal(
+          'Add Filter via Browse', 'This would allow users to set up new custom filter objects which can be used in both browse and review.'
+        )}
+      )
+    )
   }
 
   // Render Tags
@@ -88,6 +94,12 @@ export function renderBrowseView() {
       });
       tagsList.appendChild(card);
     }
-    tagsList.appendChild(createAddCard('Create new tag'));
+    tagsList.appendChild(
+      createAddCard('Create new tag', () => {
+        window.showPrototypeModal(
+          'Add Tag via Browse', 'This would allow users to set up new custom tags which can be used in both browse, create, and review.'
+        )}
+      )
+    )
   }
 }

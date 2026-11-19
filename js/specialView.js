@@ -6,15 +6,17 @@ function getElements() {
     title: document.getElementById('special-view-title'),
     headerActions: document.getElementById('special-view-header-actions'),
     body: document.getElementById('special-view-body'),
-    backBtn: document.getElementById('special-view-back')
+    backBtn: document.getElementById('special-view-back'),
+    fab: document.getElementById('add-fab')
   };
 }
 
 export function closeSpecialView() {
-  const { container, body } = getElements();
+  const { container, body, fab } = getElements();
   if (!container || container.hidden) return;
 
   container.hidden = true;
+  fab?.classList.remove('hidden');
   if (body) body.replaceChildren();
 
   const onClose = activeOnClose;
@@ -33,7 +35,7 @@ export function closeSpecialView() {
  * @param {Function} [options.onClose] - Optional callback invoked when closing.
  */
 export function openSpecialView({ title = '', headerActions = '', content = '', onClose = null } = {}) {
-  const { container, title: titleElement, headerActions: headerActionsContainer, body } = getElements();
+  const { container, title: titleElement, headerActions: headerActionsContainer, body, fab } = getElements();
   if (!container || !titleElement || !body) return;
 
   titleElement.textContent = title;
@@ -59,6 +61,7 @@ export function openSpecialView({ title = '', headerActions = '', content = '', 
 
   activeOnClose = onClose;
   container.hidden = false;
+  fab?.classList.add('hidden');
 
   // Scroll to top
   container.scrollTop = 0;

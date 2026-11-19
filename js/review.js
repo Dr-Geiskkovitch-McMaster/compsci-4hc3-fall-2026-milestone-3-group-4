@@ -341,7 +341,7 @@ function showCurrentNote(state) {
             const tagData = appData.tags.find(item => item.name === tag);
             const palette = getColorPair(tagData.color);
             chip.className = 'note-tag';
-            chip.textContent = tagData.name;
+            chip.textContent = `#${tagData.name}`;
             chip.style.backgroundColor = palette.container;
             chip.style.color = palette.accent;
             state.noteTags.append(chip);
@@ -404,7 +404,7 @@ function renderTagPicker(state) {
         option.style.backgroundColor = palette?.container ?? '#E5E5E5';
         option.style.color = palette?.accent ?? '#000000';
         option.className = 'tag-option';
-        option.textContent = tag;
+        option.textContent = `#${tag}`;
         option.addEventListener('click', () => {
             selectTag(state,tag);
         });
@@ -419,7 +419,7 @@ function renderTagPicker(state) {
         const palette = getColorPair(tagData?.color);
         chip.type = 'button';
         chip.className = 'selected-tag';
-        chip.textContent = `${tag} ×`;
+        chip.textContent = `#${tag} ×`;
         chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
         chip.style.color = palette.accent;
         chip.setAttribute('aria-label', `Remove ${tag} tag`);

@@ -41,7 +41,10 @@ export function initializeReview() {
     const backNote = reviewView.querySelector('.sticky-note--back');
 
     const reminderDialog = document.querySelector('#reminder-date-set');
-    const reminderInput = document.querySelector('#reminder-time');    
+    const reminderCancel = document.querySelector('#reminder-cancel');
+    const reminderInput = document.querySelector('#reminder-time');
+    const reminderFrequencies = document.querySelectorAll('input[name="reminder-frequency"]');
+    const reminderOccurrences = document.querySelector('#reminder-occurrences');
 
     const tagSearch = reviewView.querySelector('#review-tag');
     const tagOptions = reviewView.querySelector('#review-tag-options');
@@ -86,6 +89,9 @@ export function initializeReview() {
         noteIndex: 0,
         reminderInput,
         reminderDialog,
+        reminderCancel,
+        reminderFrequencies,
+        reminderOccurrences,
         transitionHandler: undefined,
         creatingNewStack: false,
         saveNewStack,
@@ -140,10 +146,29 @@ export function initializeReview() {
         down: () => showSwipeFeedback(state,'down', '#var(--md-sys-color-surface-container)')
     };
 
-    state.reminderDialog.addEventListener('close', () => {
-        if (state.reminderDialog.returnValue !== 'save' || !state.reminderInput.value) return;
+    state.reminderDialog.querySelector('#reminder-cancel').addEventListener('click', () => state.reminderDialog.close('cancel'));
 
-        state.noteQueue[state.noteIndex].reminder = new Date(state.reminderInput.value);
+    state.reminderDialog.addEventListener('close', () => {
+        if (state.reminderDialog.returnValue !== 'save') return;
+
+        const reminderDate = new Date(state.reminderInput.value);
+        if (!state.reminderInput.value
+            || !Number.isFinite(reminderDate.getTime())
+            || reminderDate <= new Date()) {
+            state.reminderDialog.show();
+            state.reminderInput.setCustomValidity('Choose a valid date and time in the future.');
+            state.reminderInput.reportValidity();
+            return;
+        }
+
+        const selectedFrequency = [...state.reminderFrequencies].find(frequency => frequency.checked);
+        
+        state.noteQueue[state.noteIndex].reminders.push({
+            date: reminderDate,
+            recurrence: selectedFrequency?.value ?? null,
+            occurrences: state.reminderOccurrences.value
+        });
+        console.log(state.noteQueue[state.noteIndex].reminders);
         state.feedback.textContent = 'Reminder updated';
         updateNoteQueue(state);
     });
@@ -422,6 +447,10 @@ function renderTagPicker(state) {
 function openReminderDialog(state) {
     const reminder = state.noteQueue[state.noteIndex].reminder;
     state.reminderInput.value = reminder ? toLocalDateTimeValue(reminder) : '';
+    const earliestReminder = new Date();
+    earliestReminder.setMinutes(earliestReminder.getMinutes() + 1, 0, 0);
+    state.reminderInput.min = toLocalDateTimeValue(earliestReminder);
+    state.reminderInput.setCustomValidity('');
     state.reminderDialog.show();
 }
 
@@ -437,7 +466,6 @@ function toLocalDateTimeValue(date) {
 
 function dateSoon(date,threshold) {
     const daysUntil = (date.getTime() - Date.now())/ (1000 * 60 * 60 * 24);
-    console.log(daysUntil);
     return (daysUntil < threshold);
 }
 
@@ -489,6 +517,8 @@ function handleTransitionEnd(state,event) {
     state.note.style.transition = 'none';
     state.note.style.transform = 'none';
     state.note.style.backgroundColor = '';
-    state.note.style.transition = '';
     showCurrentNote(state);
+    // Apply the offscreen reset before re-enabling the transition.
+    void state.note.offsetWidth;
+    state.note.style.transition = '';
 }

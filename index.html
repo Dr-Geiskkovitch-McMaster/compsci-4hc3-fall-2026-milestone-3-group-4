@@ -208,12 +208,33 @@
 
         <md-dialog id="reminder-date-set">
             <div slot="headline">Set reminder date</div>
-            <form slot="content" id="reminder-form" method="dialog">
-                <label for="reminder-time">Reminder date and time</label>
-                <input id="reminder-time" type="datetime-local">
+            <form slot="content" id="reminder-form" class="reminder-form" method="dialog">
+                <div class="reminder-form-field">
+                    <label for="reminder-time">Reminder date and time</label>
+                    <input id="reminder-time" type="datetime-local" required>
+                </div>
+                <fieldset class="reminder-frequency">
+                    <legend>Reminder frequency</legend>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="daily">
+                        Daily
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="weekly">
+                        Weekly
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="monthly">
+                        Monthly
+                    </label>
+                </fieldset>
+                <div class="reminder-form-field">
+                    <label for="reminder-occurrences">Reminder occurrences</label>
+                    <input id="reminder-occurrences" type="number" min="1">
+                </div>
             </form>
             <div slot="actions">
-                <md-text-button form="reminder-form" value="cancel">Cancel</md-text-button>
+                <md-text-button id="reminder-cancel" type="button">Cancel</md-text-button>
                 <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
             </div>
         </md-dialog>

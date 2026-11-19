@@ -1,3 +1,5 @@
+import appData, { getColorPair } from './data.js';
+
 const fab = document.getElementById('add-fab');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
@@ -22,25 +24,12 @@ const tagSelectSave = document.getElementById('save-tag-selection');
 const tagCreateName = document.getElementById('created-tag');
 const tagCreateButton = document.getElementById('create-tag-button');
 
-// dummy tags for testing tag selection when creating a note
-export const tags = ['school', 'random', 'food', 'capstone', 'christmas'];
-export const tagColors = {
-    school: '#DDEBFF',
-    capstone: '#E8D9FF',
-    random: '#FFE6CC',
-    home: '#D7F2DF',
-    food: '#FFF2B3',
-    untagged: '#e6e3e3',
-    open: '#e6e3e3',
-    due: '#e6e3e3'
-}
-
-
-
+export const tags = [...new Set([...appData.tags])];
 
 function resetTextArea(){
   textarea.value='';
   selectedTags.clear();
+  sessionTags.clear();
 }
 
 // trigger creating a note
@@ -73,10 +62,13 @@ textarea.addEventListener('input', () => {
 function renderTextAreaTags() {
   const currentTags = [...selectedTags].map(tagText => {
     const chip = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name === tagText);
+    const palette = getColorPair(tagData?.color);
     chip.type = 'button';
     chip.className = 'selected-tag';
     chip.textContent = `${tagText} ×`;
-    chip.style.backgroundColor = tagColors[tagText] ?? '#E5E5E5';
+    chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    chip.style.color = palette.accent;
     chip.setAttribute('aria-label', `Remove ${tagText} tag`);
 
     return chip;
@@ -128,17 +120,20 @@ function renderTagPicker() {
 
   // identify which of the current created tags match with the user's search
   const searchTerm = tagSearch.value.trim().toLowerCase();
-  const matchingTags = tags.filter(tag => !selectedTags.has(tag) && tag.toLowerCase().includes(searchTerm));
+  const matchingTags = tags.filter(tag => !selectedTags.has(tag.name) && tag.name.toLowerCase().includes(searchTerm));
 
   tagOptions.replaceChildren()
   matchingTags.forEach(tag => {
     const option = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name == tag.name);
+    const palette = getColorPair(tagData?.color);
     option.type = 'button';
-    option.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+    option.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    option.style.color = palette?.accent ?? '#000000';
     option.className = 'tag-option';
-    option.textContent = tag;
+    option.textContent = tag.name;
     option.addEventListener('click', () => {
-        selectTag(tag);
+        selectTag(tag.name);
     });
     
     tagOptions.append(option);
@@ -150,10 +145,13 @@ function renderTagPicker() {
   selectedTagList.replaceChildren();
   selectedTags.forEach(tag => {
     const chip = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name === tag);
+    const palette = getColorPair(tagData?.color);
     chip.type = 'button';
     chip.className = 'selected-tag';
     chip.textContent = `${tag} ×`;
-    chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+    chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    chip.style.color = palette.accent;
     chip.setAttribute('aria-label', `Remove ${tag} tag`);
     chip.addEventListener('click', () => {
         sessionTags.delete(tag);
@@ -168,21 +166,21 @@ tagSelectCancel.addEventListener('click', () => {
   sessionTags.forEach((item) => selectedTags.delete(item));
   sessionTags.clear();
   tagDialog.close();
-  renderTextAreaTags()
+  renderTextAreaTags();
 });
 
 tagSelectSave.addEventListener('click', () => {
   sessionTags.clear();
   tagDialog.close();
-  renderTextAreaTags()
+  renderTextAreaTags();
 });
 
 function selectTag(tag) {
   sessionTags.add(tag);
   selectedTags.add(tag);
   tagSearch.value = '';
-  renderTagPicker()
-  tagSearch.focus()
+  renderTagPicker();
+  tagSearch.focus();
 }
 
 // When user creates a tag, render it in the dialog
@@ -191,22 +189,26 @@ tagCreateButton.addEventListener('click', () => {
 
   if (userCreatedTag.length > 0) {
     selectedTags.add(userCreatedTag);
-    sessionTags.add(userCreatedTag)
+    sessionTags.add(userCreatedTag);
 
     const chip = document.createElement('button');
+    // const tagData = appData.tags.find(item => item.name === tag.name);
+    // const palette = getColorPair(tagData?.color);
     chip.type = 'button';
     chip.className = 'selected-tag';
     chip.textContent = `${userCreatedTag} ×`;
-    chip.style.backgroundColor = tagColors[userCreatedTag] ?? '#E5E5E5';
+    chip.style.backgroundColor = '#E5E5E5';
+    // chip.style.color = black;
     chip.setAttribute('aria-label', `Remove ${userCreatedTag} tag`);
     chip.addEventListener('click', () => {
         selectedTags.delete(userCreatedTag);
-        sessionTags.delete(userCreatedTag)
+        sessionTags.delete(userCreatedTag);
         renderTagPicker();
     });
 
-    tags.push(userCreatedTag);
-    tagColors[userCreatedTag] = chip.backgroundColor;
+
+
+    tags.push({name: userCreatedTag, color: '#E5E5E5', icon: 'star'});
     selectedTagList.append(chip);
   }
 

@@ -248,7 +248,6 @@ submitButton.addEventListener('click', () => {
   renderBrowseView();
 
   textarea.value = "";
-
   closePanel();
 });
 

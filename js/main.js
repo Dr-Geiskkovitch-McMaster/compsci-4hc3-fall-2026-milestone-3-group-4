@@ -1,9 +1,11 @@
 
-import './data.js';
+import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
+import { renderAgendaView } from './agenda.js';
 
 renderBrowseView();
+renderAgendaView();
 
 // Script for switching views in place using navigation bar
 const navItems = document.querySelectorAll('.nav-item');
@@ -70,7 +72,30 @@ function renderStacks(stack) {
 
   const button = document.createElement('button');
   button.className = 'layer stack-button';
-  button.textContent = stack.name;
+  const icon = stack.iconClass
+  ? Object.assign(document.createElement('span'), {
+      className: `note-preview-status-icon ${stack.iconClass}`,
+    })
+  : document.createElement('md-icon');
+
+  if (!stack.iconClass) {
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = stack.icon ?? 'label';
+  }
+  // stack icon can be first tag
+  const tagData = appData.tags.find(item => 
+    item.name === stack.tags[0]
+  );
+
+  const palette = getColorPair(tagData?.color);
+  if (!stack.iconClass) {
+    icon.style.color = palette.accent;
+  }
+  const label = document.createElement('span');
+  
+  label.textContent = stack.name;
+
+  button.replaceChildren(icon, label);
   button.addEventListener('click', () => openStack(stack));
 
   grid.append(button);

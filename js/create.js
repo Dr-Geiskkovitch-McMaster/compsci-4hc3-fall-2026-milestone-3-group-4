@@ -7,6 +7,7 @@ const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
 const cardContainer = document.getElementById('card-container-today');
+const tagsContainer = document.getElementById('textarea-tag-container');
 
 const selectTagButton = document.getElementById('tag-select');
 const tagDialog = document.getElementById('tag-dialog');
@@ -35,11 +36,24 @@ export const tagColors = {
 }
 
 
+
+
+function resetTextArea(){
+  textarea.value='';
+  selectedTags.clear();
+}
+
 // trigger creating a note
 fab.addEventListener('click', () => {
   panel.classList.remove('hidden');
   textareaBackdrop.classList.remove('hidden');
   fab.classList.add('hidden');
+
+  // remove any existing text or tags when new note created
+  resetTextArea();
+  // render the tags for the current note at the bottom of the text area
+  renderTextAreaTags();
+
 
   textarea.focus();
 });
@@ -55,6 +69,21 @@ textarea.addEventListener('input', () => {
   }
 
 });
+
+function renderTextAreaTags() {
+  const currentTags = [...selectedTags].map(tagText => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'selected-tag';
+    chip.textContent = `${tagText} ×`;
+    chip.style.backgroundColor = tagColors[tagText] ?? '#E5E5E5';
+    chip.setAttribute('aria-label', `Remove ${tagText} tag`);
+
+    return chip;
+  });
+  tagsContainer.replaceChildren(...currentTags);
+
+}
 
 // trigger expanding the note creation screen
 expandButton.addEventListener('click', () => {
@@ -139,11 +168,13 @@ tagSelectCancel.addEventListener('click', () => {
   sessionTags.forEach((item) => selectedTags.delete(item));
   sessionTags.clear();
   tagDialog.close();
+  renderTextAreaTags()
 });
 
 tagSelectSave.addEventListener('click', () => {
   sessionTags.clear();
   tagDialog.close();
+  renderTextAreaTags()
 });
 
 function selectTag(tag) {

@@ -243,6 +243,14 @@ html::-webkit-scrollbar {
     font-family: 'Roboto', sans-serif;
 }
 
+.textarea-tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
 .panel-bottom {
     display: flex;
     align-items: center;

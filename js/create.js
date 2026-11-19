@@ -267,7 +267,7 @@ submitButton.addEventListener('click', () => {
   if (editingNote) {
     editingNote.text = text;
     editingNote.tags = [...selectedTags];
-    editingNote.lastModifiedAt = new Date().toISOString;
+    editingNote.lastModifiedAt = new Date().toISOString();
 
     renderAgendaView();
     renderBrowseView();

@@ -1,5 +1,4 @@
 import appData, { getColorPair, getAllTagNames, getTagByName } from "./data.js";
-import { openNoteEditor } from "./create.js";
 
 export function createBrowseCard({ title, icon, openCount, totalCount, color }) {
   const card = document.createElement('button');
@@ -33,7 +32,7 @@ export function createBrowseCard({ title, icon, openCount, totalCount, color }) 
   return card;
 }
 
-export function createAddCard(ariaLabel) {
+export function createAddCard(ariaLabel, whenClicked = () =>  {}) {
   const card = document.createElement('button');
   card.type = 'button';
   card.className = 'm3-card m3-card--compact m3-card--add';
@@ -42,6 +41,7 @@ export function createAddCard(ariaLabel) {
     <md-ripple></md-ripple>
     <md-icon aria-hidden="true">add</md-icon>
   `;
+  card.onclick = whenClicked;
   return card;
 }
 

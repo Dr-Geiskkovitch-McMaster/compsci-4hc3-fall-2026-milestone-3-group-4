@@ -1,6 +1,8 @@
 const swipeThreshold = 150;
 import { openNoteEditor } from './create.js';
 import appData, { getColorPair } from './data.js';
+import { renderAgendaView } from './agenda.js';
+import { renderBrowseView } from './browse.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
@@ -468,7 +470,11 @@ function showSwipeFeedback(state, direction, color) {
     } else if (direction == 'down'){
         displayFeedbackText(state,'Editing note');
         openNoteEditor(state.noteQueue[state.noteIndex],
-            () => updateNoteQueue(state));
+            () => {
+                updateNoteQueue(state);
+                renderAgendaView();
+                renderBrowseView();
+            });
         return;
     }
 

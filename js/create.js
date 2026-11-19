@@ -1,5 +1,6 @@
 import appData from "./data.js";
 import { renderAgendaView } from "./agenda.js";
+import { renderBrowseView } from "./browse.js";
 
 const fab = document.getElementById('add-fab');
 const panel = document.getElementById('text-creation-panel');
@@ -71,6 +72,7 @@ submitButton.addEventListener('click', () => {
     lastModifiedAt: now,
   });
   renderAgendaView();
+  renderBrowseView();
 
   textarea.value = "";
   closePanel();

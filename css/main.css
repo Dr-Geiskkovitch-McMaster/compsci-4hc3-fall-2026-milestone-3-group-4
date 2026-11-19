@@ -38,7 +38,7 @@ html::-webkit-scrollbar {
 }
 
 .app-view {
-    margin: 0 16px 86px;
+    margin: 0 16px calc(86px + 5rem);
 }
 
 .top-nav-bar {

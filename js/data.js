@@ -358,6 +358,23 @@ export const COLOR_MAP = {
   "#00ACC1": { accent: "#00ACC1", container: "#D7F2F6", border: "#9BC9D1" }
 };
 
+export function getAllTagNames() {
+  const tags = new Set();
+  for (const tag of appData.tags) {
+    tags.add(tag.name);
+  }
+  return [...tags].sort();
+}
+
+export function getTagByName(name = '') {
+  for (const tag of appData.tags) {
+    if (tag.name == name) {
+      return tag
+    }
+  }
+  return null;
+}
+
 export function getColorPair(hex) {
   if (!hex) return COLOR_MAP["#6750A4"];
   const key = hex.toUpperCase();

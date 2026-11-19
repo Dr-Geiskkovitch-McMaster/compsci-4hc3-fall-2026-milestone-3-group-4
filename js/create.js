@@ -1,4 +1,6 @@
 import appData, { getColorPair } from './data.js';
+import { renderAgendaView } from "./agenda.js";
+import { renderBrowseView } from "./browse.js";
 
 const fab = document.getElementById('add-fab');
 const panel = document.getElementById('text-creation-panel');
@@ -8,7 +10,6 @@ const closeButton = document.getElementById('close-button');
 const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
-const cardContainer = document.getElementById('card-container-today');
 const tagsContainer = document.getElementById('textarea-tag-container');
 
 const selectTagButton = document.getElementById('tag-select');
@@ -26,6 +27,8 @@ const tagCreateButton = document.getElementById('create-tag-button');
 
 export const tags = [...new Set([...appData.tags])];
 
+renderAgendaView();
+
 function resetTextArea(){
   textarea.value='';
   selectedTags.clear();
@@ -42,8 +45,6 @@ fab.addEventListener('click', () => {
   resetTextArea();
   // render the tags for the current note at the bottom of the text area
   renderTextAreaTags();
-
-
   textarea.focus();
 });
 
@@ -220,35 +221,31 @@ tagCreateButton.addEventListener('click', () => {
 // save note text when submit button is tapped
 // build a new horizontal card for the note made
 submitButton.addEventListener('click', () => {
+
+
   const text = textarea.value.trim();
   if (!text) return;
 
-  const newCard = document.createElement('div');
-  newCard.className = 'horizontal-card';
-  const cardContent = document.createElement('div');
-  cardContent.className = 'card-content basic';
+  const now = new Date().toISOString();
+  appData.notes.unshift({
+    id: `note-${Date.now()}`,
+    type: 'text',
+    text,
+    audio: null,
+    tags: [...selectedTags],
+    dueDate: null,
+    reminders: [],
+    attachments: [],
+    pinned: false,
+    open: true,
+    deleted: false,
+    deletedAt: null,
+    createdAt: now,
+    lastModifiedAt: now,
+  });
 
-  const cardText = document.createElement('div');
-  cardText.className = 'card-text';
-  const cardBody = document.createElement('p');
-  cardBody.className = 'card-body';
-  cardBody.textContent = text;
-
-  const cardActions = document.createElement('div');
-  cardActions.className = 'card-actions';
-  const iconButton = document.createElement('md-filled-icon-button');
-  const icon = document.createElement('md-icon');
-  icon.textContent = 'Edit';
-  iconButton.appendChild(icon);
-  
-  cardText.appendChild(cardBody);
-  cardActions.appendChild(iconButton);
-  cardContent.appendChild(cardActions);
-  cardContent.appendChild(cardText);
-
-  newCard.appendChild(cardContent);
-
-  cardContainer.prepend(newCard);
+  renderAgendaView();
+  renderBrowseView();
 
   textarea.value = "";
 

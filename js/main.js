@@ -3,6 +3,7 @@ import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
 import { renderAgendaView } from './agenda.js';
+import { openSpecialView } from './specialView.js';
 import './prototypeModal.js';
 
 renderBrowseView();
@@ -14,9 +15,6 @@ const views = document.querySelectorAll('.app-view');
 const topNav = document.querySelector('.top-nav-bar');
 
 let lastScrollY = window.scrollY;
-
-const topNavBar = document.querySelector('.top-nav-bar');
-const bottomNavBar = document.querySelector('.bottom-nav-bar');
 
 const review = initializeReview();
 
@@ -120,24 +118,35 @@ function renderStacks(stack) {
 
 reviewStacks.forEach(renderStacks);
 
-const reviewHome = document.querySelector('#review-home');
 const activeReview = document.querySelector('#active-review');
 const stacks = document.querySelectorAll('.stack-button');
 
 function openStack(stack){
-  reviewHome.hidden = true;
   activeReview.hidden = false;
-  topNavBar.classList.add('review-mode');
-  bottomNavBar.classList.add('review-mode');
   review.setStack(stack.tags);
+  openSpecialView({
+    title: stack.name,
+    content: activeReview,
+    onClose: () => {
+      activeReview.hidden = true;
+      updateStackCount();
+      review.clearTags();
+    },
+  });
 }
 
 document.querySelector('#new-stack-button').addEventListener('click', () => {
-  reviewHome.hidden = true;
   activeReview.hidden = false;
-  topNavBar.classList.add('review-mode');
-  bottomNavBar.classList.add('review-mode');
   review.setStack('new-stack-button');
+  openSpecialView({
+    title: 'New Stack',
+    content: activeReview,
+    onClose: () => {
+      activeReview.hidden = true;
+      updateStackCount();
+      review.clearTags();
+    },
+  });
 });
 
 function updateStackCount() {
@@ -146,15 +155,6 @@ function updateStackCount() {
     count.textContent = String(review.countStackNotes(stack));
   });
 }
-
-document.querySelector('#exit-review').addEventListener('click', () => {
-  reviewHome.hidden = false;
-  activeReview.hidden = true;
-  topNavBar.classList.remove('review-mode');
-  bottomNavBar.classList.remove('review-mode');
-  updateStackCount();
-  review.clearTags();
-});
 
 document.addEventListener('stack-created', event => {
   renderStacks(event.detail);

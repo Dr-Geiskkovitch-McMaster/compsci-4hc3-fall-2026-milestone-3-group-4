@@ -44,7 +44,7 @@ export function createAddCard(ariaLabel) {
   return card;
 }
 
-export function createNoteCard(note) {
+export function createNoteCard(note, maxTextHeight = '6.5em') {
   const card = document.createElement('article');
   card.className = 'note-preview-card';
 
@@ -53,7 +53,32 @@ export function createNoteCard(note) {
   bodyText.className = 'note-preview-text';
   bodyText.textContent =
     note.type === 'audio' ? `AUDIO ${note.audio.transcript}` : note.text;
+
+  if (maxTextHeight) {
+    bodyText.classList.add('note-preview-text--clamped');
+    bodyText.style.setProperty(
+      '--max-text-height',
+      typeof maxTextHeight === 'number' ? `${maxTextHeight}px` : maxTextHeight
+    );
+
+    const observer = new ResizeObserver(() => {
+      bodyText.classList.toggle(
+        'is-truncated',
+        bodyText.scrollHeight > bodyText.clientHeight + 1
+      );
+    });
+    observer.observe(bodyText);
+  }
+
   card.appendChild(bodyText);
+
+  if (maxTextHeight) {
+    const moreIcon = document.createElement('md-icon');
+    moreIcon.className = 'note-preview-more';
+    moreIcon.setAttribute('aria-hidden', 'true');
+    moreIcon.textContent = 'expand_more';
+    card.appendChild(moreIcon);
+  }
 
   const meta = document.createElement('div');
   meta.className = 'note-preview-meta';
@@ -80,6 +105,14 @@ export function createNoteCard(note) {
   }
 
   card.appendChild(meta);
+
+  return card;
+}
+
+export function createAgendaCard(note, todayKey) {
+  const isOverdue = Boolean(note.dueDate && note.dueDate < todayKey && note.open);
+
+  const card = createNoteCard(note);
 
   return card;
 }

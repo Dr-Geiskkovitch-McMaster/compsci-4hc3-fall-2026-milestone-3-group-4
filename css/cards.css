@@ -181,9 +181,10 @@
 
 /* Note preview */
 .note-preview-card {
+    --note-card-bg: #FFFFFF;
     padding: 16px;
     border-radius: 16px;
-    background-color: #FFFFFF;
+    background-color: var(--note-card-bg);
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
     display: flex;
@@ -197,6 +198,37 @@
     line-height: 1.45;
     color: #1D1B20;
     white-space: pre-line;
+}
+
+.note-preview-text--clamped {
+    position: relative;
+    max-height: var(--max-text-height, 6.5em);
+    overflow: hidden;
+}
+
+.note-preview-text--clamped.is-truncated::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2em;
+    background: linear-gradient(to bottom, transparent, var(--note-card-bg, #FFFFFF));
+    pointer-events: none;
+}
+
+.note-preview-more {
+    display: none;
+    align-self: end;
+    --md-icon-size: 18px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-top: 0px;
+    margin-right: 12px;
+    z-index: 5;
+}
+
+.note-preview-text--clamped.is-truncated + .note-preview-more {
+    display: inline-flex;
 }
 
 .note-preview-meta {

@@ -552,3 +552,7 @@ html::-webkit-scrollbar {
     border-radius: 999px;
     font-size: 0.75rem;
 }
+
+.agenda-day {
+    margin-bottom: 2em;
+}

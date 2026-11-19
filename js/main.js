@@ -3,6 +3,7 @@ import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
 import { renderAgendaView } from './agenda.js';
+import './prototypeModal.js';
 
 renderBrowseView();
 renderAgendaView();

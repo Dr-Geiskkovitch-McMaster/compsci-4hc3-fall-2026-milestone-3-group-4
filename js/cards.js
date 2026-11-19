@@ -32,7 +32,7 @@ export function createBrowseCard({ title, icon, openCount, totalCount, color }) 
   return card;
 }
 
-export function createAddCard(ariaLabel) {
+export function createAddCard(ariaLabel, whenClicked = () =>  {}) {
   const card = document.createElement('button');
   card.type = 'button';
   card.className = 'm3-card m3-card--compact m3-card--add';
@@ -41,6 +41,7 @@ export function createAddCard(ariaLabel) {
     <md-ripple></md-ripple>
     <md-icon aria-hidden="true">add</md-icon>
   `;
+  card.onclick = whenClicked;
   return card;
 }
 
@@ -68,7 +69,7 @@ function formatDeadlineBadge(dueDateStr) {
   };
 }
 
-export function createNoteCard(note, maxTextHeight = '6.5em') {
+export function createNoteCard(note, maxTextHeight = '6.5em', whenClicked = () =>  {}) {
   const card = document.createElement('article');
   card.className = 'note-preview-card';
 
@@ -147,13 +148,15 @@ export function createNoteCard(note, maxTextHeight = '6.5em') {
     card.appendChild(badge);
   }
 
+  card.onclick = whenClicked;
+
   return card;
 }
 
-export function createAgendaCard(note, todayKey) {
+export function createAgendaCard(note, todayKey, whenClicked = () =>  {}) {
   const isOverdue = Boolean(note.dueDate && note.dueDate < todayKey && note.open);
 
-  const card = createNoteCard(note);
+  const card = createNoteCard(note, whenClicked);
 
   return card;
 }

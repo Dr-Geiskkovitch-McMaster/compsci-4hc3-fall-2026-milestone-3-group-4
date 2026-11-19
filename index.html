@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/cards.css">
 
     <script type="importmap">
         {
@@ -46,10 +47,10 @@
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
         <div class="card-list">
-            <button type="button" id="browse-view-all-btn" class="m3-card">
+            <button type="button" id="browse-view-all-btn" class="m3-card m3-card--compact">
                 <md-ripple></md-ripple>
                 <div class="card-content">
-                    <div class="card-icon-circle">
+                    <div class="card-icon-circle card-icon-circle--compact">
                         <md-icon aria-hidden="true">format_list_bulleted</md-icon>
                     </div>
                     <span class="card-title">View All</span>
@@ -67,7 +68,7 @@
             </button>
             <details open class="browse-section">
                 <summary class="m3-hr">
-                    <md-icon aria-hidden="true">filter_list</md-icon>
+                    <md-icon aria-hidden="true">filter_alt</md-icon>
                     <span class="m3-hr-subtitle">Filters</span>
                     <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
                 </summary>
@@ -75,7 +76,7 @@
             </details>
             <details open class="browse-section">
                 <summary class="m3-hr">
-                    <md-icon aria-hidden="true">sell</md-icon>
+                    <md-icon aria-hidden="true">Tag</md-icon>
                     <span class="m3-hr-subtitle">Tags</span>
                     <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
                 </summary>
@@ -86,64 +87,9 @@
 
     <!-- Agenda/create notes view -->
     <main id="agenda-view" class="app-view">
-
-    
         <section class="section-group">
-            <div id="card-container">
-                <md-divider></md-divider>
-                <h1 class="title-label-small">Today</h1>
-                
-                <div id="card-container-today">
-                    <div class="horizontal-card">
-                        <div class="card-content basic">
-                            <div class="card-actions">
-                                <md-filled-icon-button>
-                                    <md-icon>Schedule</md-icon>
-                                </md-filled-icon-button>
-                            </div>
-                            <div class="card-text">
-                                <p class="card-body">Text from a note that has a deadline...</p>
-                            </div>
-                    
-                            
-                        </div>
-                    </div>
-
-                    <div class="horizontal-card">
-                        <div class="card-content overdue-deadline">
-                            <div class="card-actions">
-                                <md-filled-icon-button class="deadline-button">
-                                    <md-icon>Exclamation</md-icon>
-                                </md-filled-icon-button>
-                            </div>
-                            <div class="card-text">
-                                <p class="card-body">Text from a note that is overdue</p>
-                            </div>
-                    
-                            
-                        </div>
-                    </div>
-                </div>
-
-                <md-divider></md-divider>
-                <h1 class="title-label-small">Tomorrow</h1>
-
-                <div class="horizontal-card">
-                    <div class="card-content basic">
-                        <div class="card-actions">
-                            <md-filled-icon-button>
-                                <md-icon>Edit</md-icon>
-                            </md-filled-icon-button>
-                        </div>
-                        <div class="card-text">
-                            <p class="card-body">Text from a note that has no deadline...</p>
-                        </div>
-                
-                        
-                    </div>
-                </div>
-            </section>
-        </div>
+            <div id="agenda-card-container"></div>
+        </section>
     </main>
 
     <!-- Review view -->

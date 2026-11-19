@@ -3,7 +3,7 @@ import { openSpecialView } from './specialView.js';
 import { createAddCard, createBrowseCard, createNoteCard } from './cards.js'
 import { matchesFilter } from './filters.js';
 
-function buildNotesSection(title, iconName, notes) {
+function buildNotesSection(title, iconName, notes, header = true) {
   const details = document.createElement('details');
   details.open = true;
   details.className = 'browse-section';
@@ -33,7 +33,8 @@ function buildNotesSection(title, iconName, notes) {
   }
 
   details.append(summary, list);
-  return details;
+
+  return header ? details : list;
 }
 
 function buildNotesContent(notes) {
@@ -51,12 +52,14 @@ function buildNotesContent(notes) {
   const pinnedNotes = notesSorted.filter(note => note.pinned);
   const unpinnedNotes = notesSorted.filter(note => !note.pinned);
 
+  let atLeastOnePinned = pinnedNotes.length > 0
+
   const fragment = document.createDocumentFragment();
   if (pinnedNotes.length > 0) {
     fragment.appendChild(buildNotesSection('Pinned', 'push_pin', pinnedNotes));
   }
   if (unpinnedNotes.length > 0) {
-    fragment.appendChild(buildNotesSection('Notes', 'notes', unpinnedNotes));
+    fragment.appendChild(buildNotesSection('Unpinned', 'notes', unpinnedNotes, atLeastOnePinned));
   }
   return fragment;
 }

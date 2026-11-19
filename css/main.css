@@ -553,6 +553,10 @@ html::-webkit-scrollbar {
     font-size: 0.75rem;
 }
 
+#agenda-card-container {
+    margin-bottom: 32rem;
+}
+
 .agenda-day {
     margin-bottom: 2em;
 }

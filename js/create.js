@@ -73,7 +73,6 @@ submitButton.addEventListener('click', () => {
   });
   renderAgendaView();
   renderBrowseView();
-  Review
 
   textarea.value = "";
   closePanel();

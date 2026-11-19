@@ -182,14 +182,74 @@
 /* Note preview */
 .note-preview-card {
     --note-card-bg: #FFFFFF;
+    position: relative;
     padding: 16px;
     border-radius: 16px;
     background-color: var(--note-card-bg);
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.note-preview-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
     flex-direction: column;
     gap: 8px;
+}
+
+.note-preview-status-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.note-preview-status-icon--open {
+    -webkit-mask-image: url('../assets/icons/open.svg');
+    mask-image: url('../assets/icons/open.svg');
+    background-color: var(--md-sys-color-primary, #6750A4);
+}
+
+.note-preview-status-icon--closed {
+    -webkit-mask-image: url('../assets/icons/closed.svg');
+    mask-image: url('../assets/icons/closed.svg');
+    background-color: var(--md-sys-color-on-surface-variant, #4A4458);
+}
+
+.note-preview-deadline {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    background-color: var(--md-sys-color-primary-container, #EADDFF);
+    color: var(--md-sys-color-primary, #6750A4);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.note-preview-deadline md-icon {
+    --md-icon-size: 13px;
+}
+
+.note-preview-deadline--overdue {
+    background-color: var(--md-sys-color-dark-error-container, #F9DEDC);
+    color: var(--md-sys-color-light-error, #B3261E);
 }
 
 .note-preview-text {

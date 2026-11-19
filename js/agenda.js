@@ -75,7 +75,7 @@ function createDaySection(offset, date, notes, todayKey) {
 }
 
 export function renderAgendaView() {
-  const container = document.getElementById('card-container');
+  const container = document.getElementById('agenda-card-container');
   if (!container) return;
 
   const today = new Date();

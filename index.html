@@ -214,9 +214,15 @@
         </div>
 
         <!-- Typing area -->
-        <textarea id="text-creation-textarea" class="text-creation-textarea"
-        placeholder="Type note here..."
-        rows="4"></textarea>
+        <div id="typing-area">
+            <textarea id="text-creation-textarea" class="text-creation-textarea"
+            placeholder="Type note here..."
+            rows="4"></textarea>
+
+            <div id="textarea-tag-container" class="textarea-tag-container">
+            </div>
+        </div>
+        
 
         <!-- Bottom Toolbar (attachments, tags, markdown)-->
         <div class="panel-bottom">
@@ -224,7 +230,7 @@
                 <md-icon-button>
                     <md-icon>add_photo_alternate</md-icon>
                 </md-icon-button>
-                <md-icon-button>
+                <md-icon-button id="tag-select">
                     <md-icon>target</md-icon>
                 </md-icon-button>
                 <md-icon-button>
@@ -233,10 +239,44 @@
             </div>
 
             <md-filled-icon-button id="submit-button" >
-                <md-icon>send</md-icon>
+                <md-icon>mic</md-icon>
             </md-filled-icon-button>
         </div>
      </div>
+
+    <!-- Dialog for tag selection -->
+    <md-dialog id="tag-dialog" class="select-tag-dialog">
+        <div slot="headline">Select or Create Tag</div>
+        <div slot="content" class="tag-picker">
+            <div id="tag-input-container" class="tag-input-container">
+                <div id="selected-tags" class="selected-tags" aria-label="Selected Tags"></div>
+                    <input
+                    id="note-tag"
+                    type="search"
+                    placeholder="Type or choose a tag"
+                    autocomplete="off"
+                    >
+            </div>
+            <div id="tag-select-options" class="tag-options" aria-label="tag suggestions"></div>
+            <div id="create-tag-panel" class="create-tag-panel">
+                <label for="created-tag">Create Tag:</label>
+                <div id="create-tag-input" class="create-tag-input">
+                    <input
+                    id="created-tag"
+                    placeholder="Type new name"
+                    autocomplete="off"
+                    >
+                    <md-filled-button id="create-tag-button" class="create-tag-button">Add</md-filled-button>
+                </div>
+            </div>            
+
+        </div>
+
+        <div slot="actions">
+            <md-text-button form="dialog-form" value="cancel" id="cancel-tag-selection">Cancel</md-text-button>
+            <md-filled-button form="dialog-form" value="ok" id="save-tag-selection">Save</md-filled-button>
+        </div>
+    </md-dialog>
 
     <!-- Navigation bar to switch views -->
     <nav class="bottom-nav-bar">

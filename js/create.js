@@ -1,4 +1,4 @@
-import appData from "./data.js";
+import appData, { getColorPair } from './data.js';
 import { renderAgendaView } from "./agenda.js";
 import { renderBrowseView } from "./browse.js";
 
@@ -10,7 +10,30 @@ const closeButton = document.getElementById('close-button');
 const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
+const tagsContainer = document.getElementById('textarea-tag-container');
 
+const selectTagButton = document.getElementById('tag-select');
+const tagDialog = document.getElementById('tag-dialog');
+const tagSearch = document.getElementById('note-tag');
+const tagOptions = document.getElementById('tag-select-options');
+const selectedTagList = document.getElementById('selected-tags');
+const selectedTags = new Set();
+// Represents tags that were selected during the current dialog session
+const sessionTags = new Set()
+const tagSelectCancel = document.getElementById('cancel-tag-selection');
+const tagSelectSave = document.getElementById('save-tag-selection');
+const tagCreateName = document.getElementById('created-tag');
+const tagCreateButton = document.getElementById('create-tag-button');
+
+export const tags = [...new Set([...appData.tags])];
+
+renderAgendaView();
+
+function resetTextArea(){
+  textarea.value='';
+  selectedTags.clear();
+  sessionTags.clear();
+}
 
 // trigger creating a note
 fab.addEventListener('click', () => {
@@ -18,8 +41,42 @@ fab.addEventListener('click', () => {
   textareaBackdrop.classList.remove('hidden');
   fab.classList.add('hidden');
 
+  // remove any existing text or tags when new note created
+  resetTextArea();
+  // render the tags for the current note at the bottom of the text area
+  renderTextAreaTags();
   textarea.focus();
 });
+
+// change icon to 'submit' when user starts typing
+textarea.addEventListener('input', () => {
+  const userTyped = textarea.value.trim().length > 0;
+
+  if (userTyped) {
+    submitButton.innerHTML = '<md-icon>send</md-icon>';
+  } else {
+    submitButton.innerHTML = '<md-icon>mic</md-icon>';
+  }
+
+});
+
+function renderTextAreaTags() {
+  const currentTags = [...selectedTags].map(tagText => {
+    const chip = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name === tagText);
+    const palette = getColorPair(tagData?.color);
+    chip.type = 'button';
+    chip.className = 'selected-tag';
+    chip.textContent = `${tagText} ×`;
+    chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    chip.style.color = palette.accent;
+    chip.setAttribute('aria-label', `Remove ${tagText} tag`);
+
+    return chip;
+  });
+  tagsContainer.replaceChildren(...currentTags);
+
+}
 
 // trigger expanding the note creation screen
 expandButton.addEventListener('click', () => {
@@ -35,6 +92,7 @@ expandButton.addEventListener('click', () => {
 });
 
 
+
 // hide panel when close button is tapped
 function closePanel() {
   textarea.blur(); 
@@ -42,15 +100,129 @@ function closePanel() {
   textareaBackdrop.classList.add('hidden');
   expandIcon.textContent = 'expand_content';
   fab.classList.remove('hidden');
+  submitButton.innerHTML = '<md-icon>mic</md-icon>';
   panel.style.bottom = '0px';
 }
 
 closeButton.addEventListener('click', closePanel);
 textareaBackdrop.addEventListener('click', closePanel);
 
+// open tag panel when tag select button is tapped
+selectTagButton.addEventListener('click', () => {
+  tagDialog.show();
+  renderTagPicker();
+});
+
+tagSearch.addEventListener('input', () => {
+  renderTagPicker();
+});
+
+function renderTagPicker() {
+
+  // identify which of the current created tags match with the user's search
+  const searchTerm = tagSearch.value.trim().toLowerCase();
+  const matchingTags = tags.filter(tag => !selectedTags.has(tag.name) && tag.name.toLowerCase().includes(searchTerm));
+
+  tagOptions.replaceChildren()
+  matchingTags.forEach(tag => {
+    const option = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name == tag.name);
+    const palette = getColorPair(tagData?.color);
+    option.type = 'button';
+    option.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    option.style.color = palette?.accent ?? '#000000';
+    option.className = 'tag-option';
+    option.textContent = tag.name;
+    option.addEventListener('click', () => {
+        selectTag(tag.name);
+    });
+    
+    tagOptions.append(option);
+  
+
+  });
+
+  // render each selected tag
+  selectedTagList.replaceChildren();
+  selectedTags.forEach(tag => {
+    const chip = document.createElement('button');
+    const tagData = appData.tags.find(item => item.name === tag);
+    const palette = getColorPair(tagData?.color);
+    chip.type = 'button';
+    chip.className = 'selected-tag';
+    chip.textContent = `${tag} ×`;
+    chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+    chip.style.color = palette.accent;
+    chip.setAttribute('aria-label', `Remove ${tag} tag`);
+    chip.addEventListener('click', () => {
+        sessionTags.delete(tag);
+        selectedTags.delete(tag);
+        renderTagPicker();
+    });
+    selectedTagList.append(chip);
+  });
+}
+
+tagSelectCancel.addEventListener('click', () => {
+  sessionTags.forEach((item) => selectedTags.delete(item));
+  sessionTags.clear();
+  tagDialog.close();
+  renderTextAreaTags();
+});
+
+tagSelectSave.addEventListener('click', () => {
+  sessionTags.clear();
+  tagDialog.close();
+  renderTextAreaTags();
+});
+
+function selectTag(tag) {
+  sessionTags.add(tag);
+  selectedTags.add(tag);
+  tagSearch.value = '';
+  renderTagPicker();
+  tagSearch.focus();
+}
+
+// When user creates a tag, render it in the dialog
+tagCreateButton.addEventListener('click', () => {
+  const userCreatedTag = tagCreateName.value.trim();
+
+  if (userCreatedTag.length > 0) {
+    selectedTags.add(userCreatedTag);
+    sessionTags.add(userCreatedTag);
+
+    const chip = document.createElement('button');
+    // const tagData = appData.tags.find(item => item.name === tag.name);
+    // const palette = getColorPair(tagData?.color);
+    chip.type = 'button';
+    chip.className = 'selected-tag';
+    chip.textContent = `${userCreatedTag} ×`;
+    chip.style.backgroundColor = '#E5E5E5';
+    // chip.style.color = black;
+    chip.setAttribute('aria-label', `Remove ${userCreatedTag} tag`);
+    chip.addEventListener('click', () => {
+        selectedTags.delete(userCreatedTag);
+        sessionTags.delete(userCreatedTag);
+        renderTagPicker();
+    });
+
+
+
+    tags.push({name: userCreatedTag, color: '#E5E5E5', icon: 'star'});
+    selectedTagList.append(chip);
+  }
+
+  tagCreateName.value = '';
+});
+
+
+
 // save note text when submit button is tapped
 // build a new horizontal card for the note made
 submitButton.addEventListener('click', () => {
+
+
   const text = textarea.value.trim();
   if (!text) return;
 
@@ -60,7 +232,7 @@ submitButton.addEventListener('click', () => {
     type: 'text',
     text,
     audio: null,
-    tags: [],
+    tags: [...selectedTags],
     dueDate: null,
     reminders: [],
     attachments: [],
@@ -71,6 +243,7 @@ submitButton.addEventListener('click', () => {
     createdAt: now,
     lastModifiedAt: now,
   });
+
   renderAgendaView();
   renderBrowseView();
 
@@ -80,7 +253,7 @@ submitButton.addEventListener('click', () => {
 
 if (window.visualViewport) {
 
-    // Moves panel to be above the mobile keyboard when add button is tapped
+  // Moves panel to be above the mobile keyboard when add button is tapped
   const updatePanelPosition = () => {
   if (panel.classList.contains('hidden') || panel.classList.contains('fullscreen')) return;
     

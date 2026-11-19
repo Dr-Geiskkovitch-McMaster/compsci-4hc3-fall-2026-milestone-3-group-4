@@ -3,6 +3,39 @@ import { openSpecialView } from './specialView.js';
 import { createAddCard, createBrowseCard, createNoteCard } from './cards.js'
 import { matchesFilter } from './filters.js';
 
+function buildNotesSection(title, iconName, notes) {
+  const details = document.createElement('details');
+  details.open = true;
+  details.className = 'browse-section';
+
+  const summary = document.createElement('summary');
+  summary.className = 'm3-hr';
+
+  const icon = document.createElement('md-icon');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = iconName;
+
+  const subtitle = document.createElement('span');
+  subtitle.className = 'm3-hr-subtitle';
+  subtitle.textContent = title;
+
+  const chevron = document.createElement('md-icon');
+  chevron.className = 'browse-section-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.textContent = 'expand_more';
+
+  summary.append(icon, subtitle, chevron);
+
+  const list = document.createElement('div');
+  list.className = 'card-list';
+  for (const note of notes) {
+    list.appendChild(createNoteCard(note, '12em'));
+  }
+
+  details.append(summary, list);
+  return details;
+}
+
 function buildNotesContent(notes) {
   if (notes.length === 0) {
     const empty = document.createElement('p');
@@ -11,10 +44,19 @@ function buildNotesContent(notes) {
     return empty;
   }
 
+  const notesSorted = [...notes].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const pinnedNotes = notesSorted.filter(note => note.pinned);
+  const unpinnedNotes = notesSorted.filter(note => !note.pinned);
+
   const fragment = document.createDocumentFragment();
-  for (const note of notes) {
-    const card = createNoteCard(note, '12em');
-    fragment.appendChild(card);
+  if (pinnedNotes.length > 0) {
+    fragment.appendChild(buildNotesSection('Pinned', 'push_pin', pinnedNotes));
+  }
+  if (unpinnedNotes.length > 0) {
+    fragment.appendChild(buildNotesSection('Notes', 'notes', unpinnedNotes));
   }
   return fragment;
 }
@@ -43,7 +85,8 @@ export function renderBrowseView() {
   const filtersList = document.getElementById('browse-filters-list');
   if (filtersList) {
     filtersList.replaceChildren();
-    for (const filter of appData.filters) {
+    const sortedFilters = [...appData.filters].sort((a, b) => a.name.localeCompare(b.name));
+    for (const filter of sortedFilters) {
       const matched = activeNotes.filter(note => matchesFilter(note, filter.criteria));
       const card = createBrowseCard({
         title: filter.name,

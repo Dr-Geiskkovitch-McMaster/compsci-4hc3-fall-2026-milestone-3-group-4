@@ -685,3 +685,7 @@ html::-webkit-scrollbar {
 label[for="review-tag"] {
     font-size: 1.25rem;
 }
+
+#browse-view-all-btn {
+    margin-top: 2em;
+}

@@ -20,7 +20,34 @@ const views = document.querySelectorAll('.app-view');
 const topNav = document.querySelector('.top-nav-bar');
 
 const topNavMenu = document.getElementById('top-nav-menu');
-topNavMenu.addEventListener('click', () => showPrototypeModal('topNavMenu'));
+const navDrawer = document.getElementById('nav-drawer');
+const navDrawerBackdrop = document.getElementById('nav-drawer-backdrop');
+const navDrawerClose = document.getElementById('nav-drawer-close');
+
+function openNavDrawer() {
+  if (!navDrawer || !navDrawerBackdrop) return;
+  navDrawer.hidden = false;
+  navDrawerBackdrop.hidden = false;
+}
+
+function closeNavDrawer() {
+  if (!navDrawer || !navDrawerBackdrop) return;
+  navDrawer.hidden = true;
+  navDrawerBackdrop.hidden = true;
+}
+
+topNavMenu?.addEventListener('click', openNavDrawer);
+navDrawerClose?.addEventListener('click', closeNavDrawer);
+navDrawerBackdrop?.addEventListener('click', closeNavDrawer);
+
+document.querySelectorAll('.nav-drawer-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const feature = item.dataset.feature ?? '';
+    const context = item.dataset.context ?? '';
+    closeNavDrawer();
+    window.showPrototypeModal(feature, context);
+  });
+});
 
 const avatarMenu = document.getElementById('top-nav-avatar');
 avatarMenu.addEventListener('click', () => showPrototypeModal('topNavAvatar'));

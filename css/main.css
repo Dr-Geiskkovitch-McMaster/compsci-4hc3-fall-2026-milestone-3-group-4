@@ -59,10 +59,10 @@ html::-webkit-scrollbar {
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.top-nav-bar--hidden {
+/* .top-nav-bar--hidden {
     transform: translateY(-100%); 
     opacity: 0;
-}
+} */
 
 .nav-button {
     --md-text-button-icon-color: var(--md-sys-color-on-surface-variant);
@@ -627,12 +627,16 @@ html::-webkit-scrollbar {
     font-size: 0.75rem;
 }
 
-#agenda-card-container {
-    margin-bottom: 32rem;
+#agenda-view {
+    padding-bottom: calc(100dvh - 500px);
 }
 
 .agenda-day {
     margin-bottom: 2em;
+}
+
+#agenda-today {
+    scroll-margin-top: 84px; /* to give breathing room from topnav */
 }
 
 .today-time-cursor {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/cards.css">
 
     <script type="importmap">
         {
@@ -18,6 +19,8 @@
     <script type="module">
         import '@material/web/all.js';
     </script>
+
+    <link rel="icon" href="assets/icons/open.svg" type="image/svg+xml">
 
 </head>
 <body>
@@ -75,10 +78,10 @@
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
         <div class="card-list">
-            <button type="button" id="browse-view-all-btn" class="m3-card">
+            <button type="button" id="browse-view-all-btn" class="m3-card m3-card--compact">
                 <md-ripple></md-ripple>
                 <div class="card-content">
-                    <div class="card-icon-circle">
+                    <div class="card-icon-circle card-icon-circle--compact">
                         <md-icon aria-hidden="true">format_list_bulleted</md-icon>
                     </div>
                     <span class="card-title">View All</span>
@@ -96,7 +99,7 @@
             </button>
             <details open class="browse-section">
                 <summary class="m3-hr">
-                    <md-icon aria-hidden="true">filter_list</md-icon>
+                    <md-icon aria-hidden="true">filter_alt</md-icon>
                     <span class="m3-hr-subtitle">Filters</span>
                     <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
                 </summary>
@@ -104,7 +107,7 @@
             </details>
             <details open class="browse-section">
                 <summary class="m3-hr">
-                    <md-icon aria-hidden="true">sell</md-icon>
+                    <md-icon aria-hidden="true">Tag</md-icon>
                     <span class="m3-hr-subtitle">Tags</span>
                     <md-icon class="browse-section-chevron" aria-hidden="true">expand_more</md-icon>
                 </summary>
@@ -115,64 +118,12 @@
 
     <!-- Agenda/create notes view -->
     <main id="agenda-view" class="app-view">
-
-    
         <section class="section-group">
-            <div id="card-container">
-                <md-divider></md-divider>
-                <h1 class="title-label-small">Today</h1>
-                
-                <div id="card-container-today">
-                    <div class="horizontal-card">
-                        <div class="card-content basic">
-                            <div class="card-actions">
-                                <md-filled-icon-button>
-                                    <md-icon>Schedule</md-icon>
-                                </md-filled-icon-button>
-                            </div>
-                            <div class="card-text">
-                                <p class="card-body">Text from a note that has a deadline...</p>
-                            </div>
-                    
-                            
-                        </div>
-                    </div>
-
-                    <div class="horizontal-card">
-                        <div class="card-content overdue-deadline">
-                            <div class="card-actions">
-                                <md-filled-icon-button class="deadline-button">
-                                    <md-icon>Exclamation</md-icon>
-                                </md-filled-icon-button>
-                            </div>
-                            <div class="card-text">
-                                <p class="card-body">Text from a note that is overdue</p>
-                            </div>
-                    
-                            
-                        </div>
-                    </div>
-                </div>
-
-                <md-divider></md-divider>
-                <h1 class="title-label-small">Tomorrow</h1>
-
-                <div class="horizontal-card">
-                    <div class="card-content basic">
-                        <div class="card-actions">
-                            <md-filled-icon-button>
-                                <md-icon>Edit</md-icon>
-                            </md-filled-icon-button>
-                        </div>
-                        <div class="card-text">
-                            <p class="card-body">Text from a note that has no deadline...</p>
-                        </div>
-                
-                        
-                    </div>
-                </div>
-            </section>
-        </div>
+            <div id="agenda-card-container"></div>
+            <md-fab size="small" variant="secondary" id="today-fab" class="today-button" aria-label="Jump to today">
+                <md-icon slot="icon">today</md-icon>
+            </md-fab>
+        </section>
     </main>
 
     <!-- Review view -->
@@ -193,11 +144,7 @@
         </section>
         
         <section id="active-review" hidden>
-            <div class="top-button-review">
-                <button id="exit-review" aria-label="Exit review">×</button>
-            </div>
             <div class="review-block">
-                <label for="review-tag">Review by tag</label>
                 <div class="tag-picker">
                     <div class="tag-input-container">
                         <div id="selected-review-tags" class="selected-tags" aria-label="Selected tags"></div>
@@ -216,9 +163,10 @@
                     <div class="sticky-note sticky-note--front">
                         <p>This is a sample note.</p>
                         <div class="note-tags" aria-label="Note tags"></div>
+                        <div class="note-due-date" aria-label="Note due date"></div>
                     </div>
                 </div>
-                <p class="review-feedback">Swipe the note to review it.</p>
+                <p class="review-feedback">Swipe the note to action it.</p>
             </div>
         </section>
 
@@ -236,22 +184,56 @@
 
         <md-dialog id="reminder-date-set">
             <div slot="headline">Set reminder date</div>
-            <form slot="content" id="reminder-form" method="dialog">
-                <label for="reminder-time">Reminder date and time</label>
-                <input id="reminder-time" type="datetime-local">
+            <form slot="content" id="reminder-form" class="reminder-form" method="dialog">
+                <div class="reminder-form-field">
+                    <label for="reminder-time">Reminder date and time</label>
+                    <input id="reminder-time" type="datetime-local" required>
+                </div>
+                <fieldset class="reminder-frequency">
+                    <legend>Reminder frequency</legend>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="daily">
+                        Daily
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="weekly">
+                        Weekly
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="monthly">
+                        Monthly
+                    </label>
+                </fieldset>
+                <div class="reminder-form-field">
+                    <label for="reminder-occurrences">Reminder occurrences</label>
+                    <input id="reminder-occurrences" type="number" min="1">
+                </div>
             </form>
             <div slot="actions">
-                <md-text-button form="reminder-form" value="cancel">Cancel</md-text-button>
+                <md-text-button id="reminder-cancel" type="button">Cancel</md-text-button>
                 <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
             </div>
         </md-dialog>
 
     </main>
 
+    <!-- Fab button to undo review action -->
+    <md-fab variant="primary" id="undo-fab" class="undo-button hidden">
+        <md-icon slot="icon">undo</md-icon>
+    </md-fab>
+
     <!-- Fab button to create notes -->
     <md-fab variant="primary" id="add-fab" class="add-button">
         <md-icon slot="icon">add</md-icon>
     </md-fab>
+
+    <!-- Fab button to create notes -->
+    <div class="draft-button fab-disabled" id="draft-fab-wrapper">
+        <md-fab variant="primary" id="draft-fab" class="draft-button">
+            <md-icon slot="icon">draft</md-icon>
+        </md-fab>
+        <span id="draft-badge" class="draft-badge">1</span>
+    </div>
 
     <div id="text-creation-backdrop" class="text-creation-backdrop hidden"></div>
 
@@ -260,12 +242,12 @@
 
         <div id="panel-top" class="panel-top">
             <md-icon-button id="close-button">
-                <md-icon>Close</md-icon>
+                <md-icon>arrow_back</md-icon>
             </md-icon-button>
 
             <div class="panel-top-right">
-                <md-icon-button id="star-button">
-                    <md-icon>Star</md-icon>
+                <md-icon-button id="pin-button">
+                    <md-icon>keep</md-icon>
                 </md-icon-button>
                 <md-icon-button id="expand-button">
                     <md-icon id="expand-icon">expand_content</md-icon>
@@ -275,33 +257,98 @@
         </div>
 
         <!-- Typing area -->
-        <textarea id="text-creation-textarea" class="text-creation-textarea"
-        placeholder="Type note here..."
-        rows="4"></textarea>
+        <div id="typing-area">
+            <textarea id="text-creation-textarea" class="text-creation-textarea"
+            placeholder="Type note here..."
+            rows="4"></textarea>
+
+            <div id="textarea-tag-container" class="textarea-tag-container">
+            </div>
+        </div>
+        
 
         <!-- Bottom Toolbar (attachments, tags, markdown)-->
         <div class="panel-bottom">
             <div class="bottom-icons">
-                <md-icon-button>
-                    <md-icon>add_photo_alternate</md-icon>
+                <md-icon-button onclick="window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.')">
+                    <md-icon id="media-select">add_photo_alternate</md-icon>
                 </md-icon-button>
-                <md-icon-button>
+                <md-icon-button id="due-date-select">
                     <md-icon>target</md-icon>
                 </md-icon-button>
-                <md-icon-button>
+                <md-icon-button id="reminder-select">
+                    <md-icon>schedule</md-icon>
+                </md-icon-button>
+                <md-icon-button id="tag-select">
                     <md-icon>tag</md-icon>
                 </md-icon-button>
             </div>
 
             <md-filled-icon-button id="submit-button" >
-                <md-icon>send</md-icon>
+                <md-icon id="submit-button-icon">mic</md-icon>
             </md-filled-icon-button>
         </div>
-
-        
-
-
      </div>
+
+    <!-- Dialog for tag selection -->
+    <md-dialog id="tag-dialog" class="select-tag-dialog">
+        <div slot="headline">Select or Create Tag</div>
+        <div slot="content" class="tag-picker">
+            <div id="tag-input-container" class="tag-input-container">
+                <div id="selected-tags" class="selected-tags" aria-label="Selected Tags"></div>
+                    <input
+                    id="note-tag"
+                    type="search"
+                    placeholder="Type or choose a tag"
+                    autocomplete="off"
+                    >
+            </div>
+            <div id="tag-select-options" class="tag-options" aria-label="tag suggestions"></div>
+            <div id="create-tag-panel" class="create-tag-panel">
+                <label for="created-tag">Create Tag:</label>
+                <div id="create-tag-input" class="create-tag-input">
+                    <input
+                    id="created-tag"
+                    placeholder="Type new name"
+                    autocomplete="off"
+                    >
+                    <md-filled-button id="create-tag-button" class="create-tag-button">Add</md-filled-button>
+                </div>
+            </div>            
+
+        </div>
+
+        <div slot="actions">
+            <md-text-button form="dialog-form" value="cancel" id="cancel-tag-selection">Cancel</md-text-button>
+            <md-filled-button form="dialog-form" value="ok" id="save-tag-selection">Save</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <!-- Dialog for confirm save/delete/cancel on new notes -->
+     <md-dialog id="draft-confirm-dialog">
+        <div slot="headline">Save note as draft?</div>
+        <div slot="content">You have unsaved changes in this note.</div>
+        <div slot="actions">
+            <md-text-button id="draft-cancel-btn">Cancel</md-text-button>
+            <md-text-button id="draft-delete-btn">Delete</md-text-button>
+            <md-filled-button id="draft-save-btn">Save as draft</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <!-- Dialog for setting reminder information when creating a note -->
+    <md-dialog id="due-date-set">
+        <div slot="headline">Set Due Date</div>
+        <form slot="content" id="due-date-form" class="due-date-form" method="dialog">
+            <div class="due-date-form-field" slot="content">
+                <label for="due-date-input">Due Date</label>
+                <input id="due-date-input" type="date" required>
+            </div>
+        </form>
+        <div slot="actions">
+            <md-text-button id="due-date-cancel" type="button">Cancel</md-text-button>
+            <md-filled-button id="due-date-save" form="due-date-form" value="save">Save</md-filled-button>
+        </div>
+    </md-dialog>
 
     <!-- Navigation bar to switch views -->
     <nav class="bottom-nav-bar">

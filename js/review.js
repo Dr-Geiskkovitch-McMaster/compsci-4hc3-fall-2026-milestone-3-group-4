@@ -1,121 +1,39 @@
 const swipeThreshold = 150;
-
-/* Hardcoded notes to show review functionality */
-export const notes = [
-    {
-        text: "Capstone: new model fine tuning approach? Ask TA",
-        resolved: false,
-        reminder: new Date(2026, 11, 9),
-        tags: ['school', 'capstone']
-    },
-    {
-        text: "Traitors themed birthday party",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    },
-    {
-        text: "Gift for mom: long gold earrings",
-        resolved: false,
-        reminder: new Date(2026, 11, 15),
-        tags: ['home']
-    },
-    {
-        text: "Lizzy mcalpine new album favs: \n Peach \n Ugly things \n two elevens",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    },
-    {
-        text: "quinoa power bowl recipe allrecipes",
-        resolved: false,
-        reminder: new Date(2026, 10, 19),
-        tags: ['food']
-    },
-    {
-        text: "something about inventions based on ecology",
-        resolved: false,
-        reminder: new Date(2026, 11, 1),
-        tags: ['school']
-    },
-    {
-        text: "badminton\n eng volleyball \n waterpolo (x2)?\n intramural signup monday",
-        resolved: false,
-        reminder: new Date(2026, 10, 29),
-        tags: null
-    },
-    {
-        text: "the body new show to watch",
-        resolved: false,
-        reminder: null,
-        tags: ['random']
-    }
-];
-
-export const stacks = [
-    {
-        name: "Open Loops",
-        tags: ['open'],
-        type: 'filter'
-    }, 
-    {
-        name: "Untagged",
-        tags: ['untagged'],
-        type: 'filter'
-    },  
-    {
-        name: "Due Soon",
-        tags: ['due'],
-        type: 'filter'
-    },  
-    {
-        name: "School",
-        tags: ['school'],
-        type: 'tag'
-    },   
-    {
-        name: "Random",
-        tags: ['random'],
-        type: 'tag'
-    },   
-    {
-        name: "Home",
-        tags: ['home'],
-        type: 'tag'
-    },   
-    {
-        name: "Capstone",
-        tags: ['capstone'],
-        type: 'tag'
-    },   
-    {
-        name: "Food",
-        tags: ['food'],
-        type: 'tag'
-    }
-];
+import { openNoteEditor } from './create.js';
+import appData, { getColorPair } from './data.js';
+import { renderAgendaView } from './agenda.js';
+import { renderBrowseView } from './browse.js';
+import { formatDeadlineBadge } from './cards.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
-    if (!note.resolved) updatedTags.push('open');
-    if (!note.resolved && note.reminder && dateSoon(note.reminder,2)){
+    if (note.open) updatedTags.push('open');
+    if (note.open && note.dueDate && dateSoon(new Date(note.dueDate),2)){
         updatedTags.push('due');
     }
-    
+
     return updatedTags;
 }
 
-export const tags = [...new Set([...notes.flatMap(getNoteTags), 'due'])];
-export const tagColors = {
-    school: '#DDEBFF',
-    capstone: '#E8D9FF',
-    random: '#FFE6CC',
-    home: '#D7F2DF',
-    food: '#FFF2B3',
-    untagged: '#e6e3e3',
-    open: '#e6e3e3',
-    due: '#e6e3e3'
-}
+export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
+export const stacks = [
+    { name: "Open Loops", tags: ['open'], type: 'filter', iconClass: 'note-preview-status-icon--open' },
+    { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
+    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'target'},
+
+    ...tags
+        .filter(tag => tag !== 'open' && tag !== 'due')
+        .map(tag => {
+        const tagData = appData.tags.find(item => item.name === tag);
+
+        return {
+            name: tag.charAt(0).toUpperCase() + tag.slice(1),
+            tags: [tag],
+            type: 'tag',
+            icon: tagData?.icon ?? 'label'
+        };
+    })
+];
 
 
 export function initializeReview() {
@@ -127,7 +45,11 @@ export function initializeReview() {
     const backNote = reviewView.querySelector('.sticky-note--back');
 
     const reminderDialog = document.querySelector('#reminder-date-set');
-    const reminderInput = document.querySelector('#reminder-time');    
+    const reminderCancel = document.querySelector('#reminder-cancel');
+    const reminderInput = document.querySelector('#reminder-time');
+    const reminderFrequencies = document.querySelectorAll('input[name="reminder-frequency"]');
+    const reminderOccurrences = document.querySelector('#reminder-occurrences');
+    const undoReview = document.querySelector('#undo-fab');
 
     const tagSearch = reviewView.querySelector('#review-tag');
     const tagOptions = reviewView.querySelector('#review-tag-options');
@@ -147,9 +69,10 @@ export function initializeReview() {
 
     const noteText = note.querySelector('p');
     const noteTags = note.querySelector('.note-tags');
+    const noteDueDate = note.querySelector('.note-due-date');
 
-    if (!noteText || !noteTags) {
-        throw new Error('Review note is missing its text or tags element.');
+    if (!noteText || !noteTags || !noteDueDate ) {
+        throw new Error('Review note is missing its text, tags, or due date element.');
     }
     
     const state = {
@@ -158,25 +81,31 @@ export function initializeReview() {
         noteStack,
         backNote,
         noteTags,
+        noteDueDate,
         feedback,
         reviewView,
         tagSearch,
         tagOptions,
         selectedTagList,
-        noteQueue: notes,
+        noteQueue: appData.notes,
         selectedTags: new Set(),
         startPoint: undefined,
         touchIdentifier: undefined,
         noteIndex: 0,
         reminderInput,
         reminderDialog,
+        reminderCancel,
+        reminderFrequencies,
+        reminderOccurrences,
         transitionHandler: undefined,
         creatingNewStack: false,
         saveNewStack,
         newStackInput,
         saveNewStackDialog,
         swipeHint,
-        feedbackTimeout: undefined
+        feedbackTimeout: undefined,
+        undoReview,
+        pastReviews: []
     };
 
     state.transitionHandler = event => handleTransitionEnd(state, event);
@@ -224,42 +153,51 @@ export function initializeReview() {
         down: () => showSwipeFeedback(state,'down', '#var(--md-sys-color-surface-container)')
     };
 
-    state.reminderDialog.addEventListener('close', () => {
-        if (state.reminderDialog.returnValue !== 'save' || !state.reminderInput.value) return;
+    state.reminderDialog.querySelector('#reminder-cancel').addEventListener('click', () => state.reminderDialog.close('cancel'));
 
-        state.noteQueue[state.noteIndex].reminder = new Date(state.reminderInput.value);
+    state.reminderDialog.addEventListener('close', () => {
+        if (state.reminderDialog.returnValue !== 'save') return;
+
+        const reminderDate = new Date(state.reminderInput.value);
+        if (!state.reminderInput.value
+            || !Number.isFinite(reminderDate.getTime())
+            || reminderDate <= new Date()) {
+            state.reminderDialog.show();
+            state.reminderInput.setCustomValidity('Choose a valid date and time in the future.');
+            state.reminderInput.reportValidity();
+            return;
+        }
+
+        const selectedFrequency = [...state.reminderFrequencies].find(frequency => frequency.checked);
+        
+        state.noteQueue[state.noteIndex].reminders.push({
+            date: reminderDate,
+            recurrence: selectedFrequency?.value ?? null,
+            occurrences: state.reminderOccurrences.value
+        });
+        console.log(state.noteQueue[state.noteIndex].reminders);
         state.feedback.textContent = 'Reminder updated';
         updateNoteQueue(state);
     });
 
-    note.addEventListener('touchstart', event => {
-        if (event.touches.length !== 1) {
-            state.startPoint = undefined;
-            state.touchIdentifier = undefined;
-            return;
-        }
+    note.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
 
-        const touch = event.touches[0];
-        state.touchIdentifier = touch.identifier;
-        state.startPoint = { x: touch.clientX, y: touch.clientY };
-    }, { passive: true });
+        state.pointerId = event.pointerId;
+        state.startPoint = { x: event.clientX, y: event.clientY };
+        note.setPointerCapture(event.pointerId);
+    });
 
     /* event listener to hint when partial swipe is done */
-    note.addEventListener('touchmove', event => {
-        if (!state.startPoint || state.touchIdentifier === undefined) {
+    note.addEventListener('pointermove', event => {
+        if (event.pointerId !== state.pointerId || !state.startPoint ) {
             return;
         }
 
-        const touch = Array.from(event.changedTouches)
-            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
-        if (!touch) {
-            return;
-        }
+        const horizontalDistance = event.clientX - state.startPoint.x;
+        const verticalDistance = event.clientY - state.startPoint.y;
 
-        const horizontalDistance = touch.clientX - state.startPoint.x;
-        const verticalDistance = touch.clientY - state.startPoint.y;
-
-        /** determine whether touch is start of a swipe */
+        /** determine whether click is start of a swipe */
         const hintThreshold = 50;
         let direction; 
         
@@ -272,7 +210,8 @@ export function initializeReview() {
         }
 
         if (!direction) {
-            state.swipeHint.hidden = true;
+            state.feedback.textContent = 'Swipe the note to action it.';
+            state.feedback.hidden = false;
             return;
         }
         const hints = {
@@ -285,24 +224,18 @@ export function initializeReview() {
         displayFeedbackText(state,hints[direction]);
     }, { passive: true });
 
-    note.addEventListener('touchend', event => {
-        if (!state.startPoint || state.touchIdentifier === undefined) {
+    note.addEventListener('pointerup', event => {
+        if (event.pointerId !== state.pointerId || !state.startPoint ) {
             return;
         }
 
-        const touch = Array.from(event.changedTouches)
-            .find(changedTouch => changedTouch.identifier === state.touchIdentifier);
-        if (!touch) {
-            return;
-        }
-
-        const horizontalDistance = touch.clientX - state.startPoint.x;
-        const verticalDistance = touch.clientY - state.startPoint.y;
+        const horizontalDistance = event.clientX - state.startPoint.x;
+        const verticalDistance = event.clientY - state.startPoint.y;
 
         state.startPoint = undefined;
-        state.touchIdentifier = undefined;
+        state.pointerId = undefined;
 
-        /** determine whether touch warrants a swipe */
+        /** determine whether click warrants a swipe */
         if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)
             && Math.abs(horizontalDistance) > swipeThreshold) {
             swipeActions[horizontalDistance > 0 ? 'right' : 'left']();
@@ -311,9 +244,33 @@ export function initializeReview() {
         }
     }, { passive: true });
 
-    note.addEventListener('touchcancel', () => {
+    note.addEventListener('pointercancel', () => {
         state.startPoint = undefined;
-        state.touchIdentifier = undefined;
+        state.pointerId = undefined;
+    });
+
+    // undo button listener
+    state.undoReview.addEventListener('click', () => {
+        const previous = state.pastReviews.pop();
+        if (!previous) return;
+
+        if (previous.undoResolve) {
+            state.noteQueue[previous.index].resolved = false;
+        }
+        
+        state.noteIndex = previous.index;
+        state.note.removeEventListener('transitionend', state.transitionHandler);
+        state.note.style.transition = 'none';
+        state.note.style.transform = 'none';
+        state.note.style.backgroundColor = '';
+        showCurrentNote(state);
+        if (state.pastReviews.length === 0) {
+            state.undoReview.classList.add('hidden');
+        }
+        displayFeedbackText(state, 'Action reversed');
+
+        void state.note.offsetWidth; // Apply the reset before restoring the transition
+        state.note.style.transition = '';
     });
 
     state.saveNewStack.addEventListener('click', () => {
@@ -328,7 +285,7 @@ export function initializeReview() {
         const newStack = {
             name: state.newStackInput.value,
             tags: [...state.selectedTags],
-            type: 'custom'
+            type: 'filter'
         } 
 
         stacks.push(newStack);
@@ -342,6 +299,8 @@ export function initializeReview() {
 
     /** accessible by main.js, function to set which stack is reviewed */
     function setStack(selectedStack){
+        state.pastReviews.length = 0;
+        state.undoReview.classList.add('hidden');
         if (selectedStack === "new-stack-button"){
             createNewStack(state);
         } else {
@@ -360,9 +319,14 @@ export function initializeReview() {
 
 /* save button is only visible when stack with selected tags doesn't already exist */
 function updateSaveButtonVisibility(state) {
-    const stackAlreadyExists = stacks.some(stack =>
-        stack.tags.length === state.selectedTags.size
-        && stack.tags.every(tag => state.selectedTags.has(tag))
+    const selectedTags = new Set([...state.selectedTags].filter(tag => tag !== 'open'));
+    const stackAlreadyExists = stacks.some(stack => {
+        const stackTags = stack.tags.filter(tag => tag !== 'open');
+
+        return stackTags.length === selectedTags.size
+        && stackTags.every(tag => selectedTags.has(tag))
+    }
+        
     );
 
     state.saveNewStack.hidden =
@@ -371,7 +335,7 @@ function updateSaveButtonVisibility(state) {
 
 /* count notes in stack for ui */
 function countStackNotes(stack) {
-    return notes.filter(note =>
+    return appData.notes.filter(note =>
         !note.resolved && stack.tags.some(tag => getNoteTags(note).includes(tag))
     ).length;
 }
@@ -398,18 +362,38 @@ function showCurrentNote(state) {
 
     state.noteStack.hidden = false;
     const currentNote = state.noteQueue[state.noteIndex];
-    state.noteText.textContent = currentNote.text;
+    state.noteText.textContent = currentNote.text ? currentNote.text : `AUDIO: ${currentNote.audio.transcript}`;
     state.noteTags.replaceChildren();
     /** draw tags on the note */
     (getNoteTags(currentNote) ?? []).forEach(tag => {
         if (tag !== 'untagged' && tag !== 'open' && tag !== 'due'){
             const chip = document.createElement('span');
+            const tagData = appData.tags.find(item => item.name === tag);
+            const palette = getColorPair(tagData.color);
             chip.className = 'note-tag';
-            chip.textContent = tag;
-            chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+            chip.textContent = `#${tagData.name}`;
+            chip.style.backgroundColor = palette.container;
+            chip.style.color = palette.accent;
             state.noteTags.append(chip);
         }
     });
+    // draw due date on the note
+    state.noteDueDate.textContent = currentNote.dueDate ? `Due ${currentNote.dueDate}` : '';
+    if (currentNote.dueDate) {
+        const { text, overdue } = formatDeadlineBadge(currentNote.dueDate);
+        const icon = document.createElement('md-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = 'target';
+
+        state.noteDueDate.classList.add('note-preview-deadline');
+        state.noteDueDate.classList.toggle('note-preview-deadline--overdue', overdue);
+        state.noteDueDate.replaceChildren(icon, text);
+    } else {
+        state.noteDueDate.textContent = '';
+        state.noteDueDate.classList.remove('note-preview-deadline');
+    }
+
+
     state.backNote.hidden = state.noteQueue.slice(state.noteIndex + 1)
         .every(queuedNote => queuedNote.resolved);
 }
@@ -417,14 +401,17 @@ function showCurrentNote(state) {
 /** update queue for when tags are selected */
 function updateNoteQueue(state) {
     if (state.selectedTags.size > 0) {
-        state.noteQueue = notes.filter (note =>
+        state.noteQueue = appData.notes.filter (note =>
             getNoteTags(note).some(tag => state.selectedTags.has(tag))
         );
     } else {
-        state.noteQueue = state.creatingNewStack ? [] : notes;
+        state.noteQueue = state.creatingNewStack ? [] : appData.notes;
     }
 
     state.noteIndex = 0;
+    state.pastReviews.length = 0;
+    state.undoReview.classList.add('hidden');
+
     showCurrentNote(state);
 }
 
@@ -458,10 +445,13 @@ function renderTagPicker(state) {
     state.tagOptions.replaceChildren();
     matchingTags.forEach(tag => {
         const option = document.createElement('button');
+        const tagData = appData.tags.find(item => item.name === tag);
+        const palette = getColorPair(tagData?.color);
         option.type = 'button';
-        option.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        option.style.backgroundColor = palette?.container ?? '#E5E5E5';
+        option.style.color = palette?.accent ?? '#000000';
         option.className = 'tag-option';
-        option.textContent = tag;
+        option.textContent = `#${tag}`;
         option.addEventListener('click', () => {
             selectTag(state,tag);
         });
@@ -472,10 +462,13 @@ function renderTagPicker(state) {
     state.selectedTagList.replaceChildren();
     state.selectedTags.forEach(tag => {
         const chip = document.createElement('button');
+        const tagData = appData.tags.find(item => item.name === tag);
+        const palette = getColorPair(tagData?.color);
         chip.type = 'button';
         chip.className = 'selected-tag';
-        chip.textContent = `${tag} ×`;
-        chip.style.backgroundColor = tagColors[tag] ?? '#E5E5E5';
+        chip.textContent = `#${tag} ×`;
+        chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
+        chip.style.color = palette.accent;
         chip.setAttribute('aria-label', `Remove ${tag} tag`);
         chip.addEventListener('click', () => {
             state.selectedTags.delete(tag);
@@ -489,6 +482,10 @@ function renderTagPicker(state) {
 function openReminderDialog(state) {
     const reminder = state.noteQueue[state.noteIndex].reminder;
     state.reminderInput.value = reminder ? toLocalDateTimeValue(reminder) : '';
+    const earliestReminder = new Date();
+    earliestReminder.setMinutes(earliestReminder.getMinutes() + 1, 0, 0);
+    state.reminderInput.min = toLocalDateTimeValue(earliestReminder);
+    state.reminderInput.setCustomValidity('');
     state.reminderDialog.show();
 }
 
@@ -508,17 +505,37 @@ function dateSoon(date,threshold) {
 }
 
 function showSwipeFeedback(state, direction, color) {
+    console.log(state.pastReviews);
     if (direction === 'left'){
         displayFeedbackText(state,'Note dismissed');
+        state.undoReview.classList.remove('hidden');
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: false
+        })
     } else if (direction === 'right'){
         displayFeedbackText(state,'Note resolved');
         state.noteQueue[state.noteIndex].resolved = true;
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: true
+        })
+        state.undoReview.classList.remove('hidden');
     } else if (direction === 'up') {
         displayFeedbackText(state,'Change reminder');
         openReminderDialog(state);
         return;
     } else if (direction == 'down'){
         displayFeedbackText(state,'Editing note');
+        openNoteEditor(state.noteQueue[state.noteIndex],
+            () => {
+                updateNoteQueue(state);
+                renderAgendaView();
+                renderBrowseView();
+            });
+        return;
     }
 
     state.note.style.backgroundColor = color;
@@ -542,7 +559,8 @@ function displayFeedbackText (state, message, duration = 2000){
     state.feedback.hidden = false;
 
     state.feedbackTimeout = setTimeout(() => {
-        state.feedback.hidden = true;
+        state.feedback.textContent = 'Swipe the note to action it.';
+        state.feedback.hidden = false;
     }, duration);
 }
 
@@ -555,6 +573,8 @@ function handleTransitionEnd(state,event) {
     state.note.style.transition = 'none';
     state.note.style.transform = 'none';
     state.note.style.backgroundColor = '';
-    state.note.style.transition = '';
     showCurrentNote(state);
+    // Apply the offscreen reset before re-enabling the transition.
+    void state.note.offsetWidth;
+    state.note.style.transition = '';
 }

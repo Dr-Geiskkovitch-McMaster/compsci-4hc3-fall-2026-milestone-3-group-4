@@ -4,6 +4,7 @@ import { renderBrowseView } from "./browse.js";
 
 const fab = document.getElementById('add-fab');
 const todayFab = document.getElementById('today-fab');
+const draftFab = document.getElementById('draft-fab-wrapper');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
 const textareaBackdrop = document.getElementById('text-creation-backdrop');
@@ -37,6 +38,12 @@ const dueDateInput = document.getElementById('due-date-input');
 
 // Reminder Selection
 const selectReminderButton = document.getElementById('reminder-select')
+// Draft confirm dialogue
+const draftConfirmDialog = document.getElementById('draft-confirm-dialog');
+const draftConfirmDialogCancel = document.getElementById('draft-cancel-btn');
+const draftConfirmDialogDelete = document.getElementById('draft-delete-btn');
+const draftConfirmDialogSave = document.getElementById('draft-save-btn');
+
 
 const viewPort = window.visualViewport;
 
@@ -47,6 +54,17 @@ let saveCallback = null;
 
 renderAgendaView();
 
+function hideFabs(){
+  fab.classList.add('hidden');
+  todayFab.classList.add('hidden')
+  draftFab.classList.add('hidden')
+}
+
+function showFabs(){
+  fab.classList.remove('hidden');
+  todayFab.classList.remove('hidden')
+  draftFab.classList.remove('hidden')
+}
 
 dueDateCreateButton.addEventListener('click', () => {
   openDueDateDialog();
@@ -57,6 +75,28 @@ dueDateCancelButton.addEventListener('click', () => {
   dueDateDialog.close();
 });
 
+draftConfirmDialogCancel.addEventListener('click', () => {
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogDelete.addEventListener('click', () => {
+    resetTextArea();
+    dueDateInput.value = '';
+    closePanel();
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogSave.addEventListener('click', () => {
+    resetTextArea();
+    enableDraftsFab();
+    dueDateInput.value = '';
+    closePanel();
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogCancel.addEventListener('click', () => {
+    draftConfirmDialog.close()
+});
 
 function openDueDateDialog() {
   const earliestReminder = new Date();
@@ -81,6 +121,14 @@ dueDateSaveButton.addEventListener('click', () => {
 
 });
 
+function hasUnsavedContent() {
+  return (
+    textarea.value.trim().length > 0 ||
+    selectedTags.size > 0 ||
+    Boolean(dueDateInput?.value)
+  );
+}
+
 function toLocalDateValue(date) {
     const pad = value => String(value).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -92,12 +140,19 @@ function resetTextArea(){
   sessionTags.clear();
 }
 
+function enableDraftsFab(){
+  draftFab.classList.remove('fab-disabled');
+}
+
+function disableDraftsFab(){
+  draftFab.classList.add('fab-disabled');
+}
+
 // trigger creating a note
 fab.addEventListener('click', () => {
   panel.classList.remove('hidden');
   textareaBackdrop.classList.remove('hidden');
-  fab.classList.add('hidden');
-  todayFab.classList.add('hidden')
+  hideFabs();
 
   // remove any existing text or tags when new note created
   resetTextArea();
@@ -109,6 +164,15 @@ fab.addEventListener('click', () => {
     toggleFullScreen();
   }
   textarea.focus();
+});
+
+draftFab.addEventListener('click', () => {
+  window.showPrototypeModal(
+    'Edit Drafts',
+    'Users can see a list of drafts they have and from there quickly delete or edit/save them\n\nWhen you close this pop up, we will hide this fab. It will only appear if a user has drafts they have not submitted/deleted.',
+    'Prototype Limitation',
+    disableDraftsFab
+  )
 });
 
 // change icon to 'submit' when user starts typing
@@ -165,18 +229,28 @@ expandButton.addEventListener('click', () => {
 
 
 // hide panel when close button is tapped
+// actually will intercept first for using the save modal
 function closePanel() {
   textarea.blur(); 
   panel.classList.add('hidden');
   textareaBackdrop.classList.add('hidden');
-  fab.classList.remove('hidden');
-  todayFab.classList.remove('hidden')
+  expandIcon.textContent = 'expand_content';
+  showFabs();
   submitButton.innerHTML = '<md-icon>mic</md-icon>';
   panel.style.bottom = '0px';
 }
 
-closeButton.addEventListener('click', closePanel);
-textareaBackdrop.addEventListener('click', closePanel);
+
+function requestClosePanel() {
+  if (!editingNote && hasUnsavedContent()) {
+    draftConfirmDialog.show();
+    return;
+  }
+  closePanel();
+}
+
+closeButton.addEventListener('click', requestClosePanel);
+textareaBackdrop.addEventListener('click', requestClosePanel);
 
 // open tag panel when tag select button is tapped
 selectTagButton.addEventListener('click', () => {
@@ -240,8 +314,7 @@ export function openNoteEditor(note = null, onSave){
   if (!note){
     panel.classList.remove('hidden');
     textareaBackdrop.classList.remove('hidden');
-    fab.classList.add('hidden');
-    todayFab.classList.add('hidden')
+    hideFabs();
 
     // remove any existing text or tags when new note created
     resetTextArea();
@@ -253,8 +326,7 @@ export function openNoteEditor(note = null, onSave){
     panel.classList.remove('hidden');
     panel.classList.add('fullscreen');
     textareaBackdrop.classList.remove('hidden');
-    fab.classList.add('hidden');
-    todayFab?.classList.add('hidden');
+    hideFabs()
     editingNote = note;
     saveCallback = onSave;
 

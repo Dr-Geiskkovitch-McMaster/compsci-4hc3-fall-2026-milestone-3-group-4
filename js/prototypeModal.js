@@ -1,6 +1,7 @@
 let dialogEl = null;
+let activeOnClose = null;
 
-function ensureDialog() {
+function ensureDialog(onClose = () => {}) {
   if (dialogEl) return dialogEl;
 
   const dialog = document.createElement('md-dialog');
@@ -47,6 +48,12 @@ function ensureDialog() {
   closeBtn.addEventListener('click', () => dialog.close());
   actions.appendChild(closeBtn);
 
+  dialog.addEventListener('closed', () => {
+    const cb = activeOnClose;
+    activeOnClose = null;
+    if (typeof cb === 'function') cb();
+  });
+
   dialog.append(headerRow, content, actions);
   document.body.appendChild(dialog);
   dialogEl = dialog;
@@ -59,7 +66,7 @@ function ensureDialog() {
  * @param {string} [context] - Additional explanation or context for the user.
  * @param {{ title?: string }} [options] - Optional overrides.
  */
-export function showPrototypeModal(feature = '', context = '', title = 'Prototype Limitation') {
+export function showPrototypeModal(feature = '', context = '', title = 'Prototype Limitation', onClose = () => {}) {
   const dialog = ensureDialog();
 
   const headline = dialog.querySelector('[data-role="headline"]');
@@ -79,6 +86,7 @@ export function showPrototypeModal(feature = '', context = '', title = 'Prototyp
     contextEl.hidden = true;
   }
 
+  activeOnClose = onClose;
   dialog.show();
 }
 

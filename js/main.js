@@ -2,7 +2,7 @@
 import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
-import { renderAgendaView } from './agenda.js';
+import { renderAgendaView, scrollToToday } from './agenda.js';
 import { openSpecialView } from './specialView.js';
 import './prototypeModal.js';
 
@@ -22,6 +22,8 @@ const topNav = document.querySelector('.top-nav-bar');
 let lastScrollY = window.scrollY;
 
 const review = initializeReview();
+
+document.getElementById('today-fab')?.addEventListener('click', () => scrollToToday('smooth'));
 
 navItems.forEach(item => {
   item.addEventListener('click', () => {

@@ -176,6 +176,14 @@
         <md-icon slot="icon">add</md-icon>
     </md-fab>
 
+    <!-- Fab button to create notes -->
+    <div class="draft-button fab-disabled" id="draft-fab-wrapper">
+        <md-fab variant="primary" id="draft-fab" class="draft-button">
+            <md-icon slot="icon">draft</md-icon>
+        </md-fab>
+        <span id="draft-badge" class="draft-badge">1</span>
+    </div>
+
     <div id="text-creation-backdrop" class="text-creation-backdrop hidden"></div>
 
     <!-- Text field area for user notes -->
@@ -259,6 +267,17 @@
         <div slot="actions">
             <md-text-button form="dialog-form" value="cancel" id="cancel-tag-selection">Cancel</md-text-button>
             <md-filled-button form="dialog-form" value="ok" id="save-tag-selection">Save</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <!-- Dialog for confirm save/delete/cancel on new notes -->
+     <md-dialog id="draft-confirm-dialog">
+        <div slot="headline">Save note as draft?</div>
+        <div slot="content">You have unsaved changes in this note.</div>
+        <div slot="actions">
+            <md-text-button id="draft-cancel-btn">Cancel</md-text-button>
+            <md-text-button id="draft-delete-btn">Delete</md-text-button>
+            <md-filled-button id="draft-save-btn">Save as draft</md-filled-button>
         </div>
     </md-dialog>
 

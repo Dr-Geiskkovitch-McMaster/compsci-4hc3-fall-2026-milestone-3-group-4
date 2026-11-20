@@ -34,6 +34,8 @@ const dueDateCancelButton = document.getElementById('due-date-cancel');
 const dueDateSaveButton = document.getElementById('due-date-save');
 const dueDateInput = document.getElementById('due-date-input');
 
+const viewPort = window.visualViewport;
+
 export const tags = [...new Set([...appData.tags])];
 
 let editingNote = null;
@@ -137,9 +139,12 @@ expandButton.addEventListener('click', () => {
 
   expandIcon.textContent = isFullScreen ? 'collapse_content' : 'expand_content';
 
-  if (isFullScreen) {
-    panel.style.bottom = '0px';
-  }
+  panel.style.removeProperty('bottom');
+
+
+  updatePanelPosition(panel);
+
+  textarea.focus();
 
 });
 
@@ -355,17 +360,23 @@ submitButton.addEventListener('click', () => {
   closePanel();
 });
 
-if (window.visualViewport) {
+function updatePanelPosition(panel) {
 
-  // Moves panel to be above the mobile keyboard when add button is tapped
-  const updatePanelPosition = () => {
-  if (panel.classList.contains('hidden') || panel.classList.contains('fullscreen')) return;
-    
-    
-  const keyboardHeight = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-  panel.style.bottom = `${Math.max(0, keyboardHeight)}px`;
+  if (!panel.classList.contains('hidden') || !panel.classList.contains('fullscreen')) {
+    panel.style.removeProperty('--vv-top');
+    panel.style.removeProperty('--vv-left');
+    panel.style.removeProperty('--vv-width');
+    panel.style.removeProperty('--vv-height');
+    return;
   };
 
-  window.visualViewport.addEventListener('resize', updatePanelPosition);
-  window.visualViewport.addEventListener('scroll', updatePanelPosition);
+  if (!viewPort) return;
+
+  panel.style.setProperty('--vv-top', `${vv.offsetTop}px`);
+  panel.style.setProperty('--vv-left', `${vv.offsetLeft}px`);
+  panel.style.setProperty('--vv-width', `${vv.width}px`);
+  panel.style.setProperty('--vv-height', `${vv.height}px`);
 }
+
+viewPort.addEventListener('resize', updatePanelPosition);
+viewPort.addEventListener('scroll', updatePanelPosition);

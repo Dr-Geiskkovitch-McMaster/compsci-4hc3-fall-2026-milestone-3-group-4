@@ -697,6 +697,8 @@ label[for="review-tag"] {
     row-gap: 16px;
     height: 100%;
     min-height: 0;
+}
+
 #browse-view-all-btn {
     margin-top: 2em;
 }

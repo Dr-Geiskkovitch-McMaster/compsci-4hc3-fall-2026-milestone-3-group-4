@@ -7,13 +7,12 @@ const todayFab = document.getElementById('today-fab');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
 const textareaBackdrop = document.getElementById('text-creation-backdrop');
-const closeButton = document.getElementById('close-button');
+const backButton = document.getElementById('close-button');
 const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
 const tagsContainer = document.getElementById('textarea-tag-container');
-const addMediaButton = document.getElementById('media-select');
-const favouriteButton = document.getElementById('star-button');
+const pinButton = document.getElementById('pin-button');
 
 // Tag Selection
 const selectTagButton = document.getElementById('tag-select');
@@ -29,12 +28,15 @@ const tagSelectSave = document.getElementById('save-tag-selection');
 const tagCreateName = document.getElementById('created-tag');
 const tagCreateButton = document.getElementById('create-tag-button');
 
-// Reminder Selection
-const dueDateCreateButton = document.getElementById('reminder-select');
+// Due Date Selection
+const dueDateCreateButton = document.getElementById('due-date-select');
 const dueDateDialog = document.getElementById('due-date-set');
 const dueDateCancelButton = document.getElementById('due-date-cancel');
 const dueDateSaveButton = document.getElementById('due-date-save');
 const dueDateInput = document.getElementById('due-date-input');
+
+// Reminder Selection
+const selectReminderButton = document.getElementById('reminder-select')
 
 const viewPort = window.visualViewport;
 
@@ -173,7 +175,7 @@ function closePanel() {
   panel.style.bottom = '0px';
 }
 
-closeButton.addEventListener('click', closePanel);
+backButton.addEventListener('click', closePanel);
 textareaBackdrop.addEventListener('click', closePanel);
 
 // open tag panel when tag select button is tapped
@@ -322,12 +324,12 @@ tagCreateButton.addEventListener('click', () => {
   tagCreateName.value = '';
 });
 
-addMediaButton.addEventListener('click', () => {
-  window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.');
+selectReminderButton.addEventListener('click', () => {
+  window.showPrototypeModal('Select Reminder','This feature would allow you to select reminders to follow up on this note. To see this, try changing a reminder of an existing note in the \'Review\' tab.');
 });
 
-favouriteButton.addEventListener('click', () => {
-  window.showPrototypeModal('Mark as Favourite','This feature would mark your note as a favourite and would be integrated throughout filters in each view.');
+pinButton.addEventListener('click', () => {
+  window.showPrototypeModal('Pin','This feature would pin your note to save it for later, and any pinned notes would be integrated throughout filters in each view.');
 });
 
 

@@ -19,7 +19,7 @@ export function closeSpecialView() {
   if (!container || container.hidden) return;
 
   container.hidden = true;
-  for (fab of fabs) {
+  for (const fab of fabs) {
     fab?.classList.remove('hidden');
   }
   if (headerActions) headerActions.replaceChildren();
@@ -68,7 +68,7 @@ export function openSpecialView({ title = '', headerActions = '', content = '', 
 
   activeOnClose = onClose;
   container.hidden = false;
-  for (fab of fabs) {
+  for (const fab of fabs) {
     fab?.classList.add('hidden');
   }
 

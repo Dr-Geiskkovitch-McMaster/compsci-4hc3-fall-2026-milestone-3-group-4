@@ -12,6 +12,7 @@ const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
 const tagsContainer = document.getElementById('textarea-tag-container');
 
+// Tag Selection
 const selectTagButton = document.getElementById('tag-select');
 const tagDialog = document.getElementById('tag-dialog');
 const tagSearch = document.getElementById('note-tag');
@@ -25,9 +26,55 @@ const tagSelectSave = document.getElementById('save-tag-selection');
 const tagCreateName = document.getElementById('created-tag');
 const tagCreateButton = document.getElementById('create-tag-button');
 
+// Reminder Selection
+const dueDateCreateButton = document.getElementById('reminder-select');
+const dueDateDialog = document.getElementById('due-date-set');
+const dueDateCancelButton = document.getElementById('due-date-cancel');
+const dueDateSaveButton = document.getElementById('due-date-save');
+const dueDateInput = document.getElementById('due-date-input');
+
 export const tags = [...new Set([...appData.tags])];
 
 renderAgendaView();
+
+
+dueDateCreateButton.addEventListener('click', () => {
+  openDueDateDialog();
+});
+
+dueDateCancelButton.addEventListener('click', () => {
+  dueDateInput.value = '';
+  dueDateDialog.close();
+});
+
+
+function openDueDateDialog() {
+  const earliestReminder = new Date();
+  if (!dueDateInput.value) {
+    dueDateInput.value = '';
+    dueDateInput.min = toLocalDateValue(earliestReminder);
+    dueDateInput.setCustomValidity('');
+  }
+  
+  dueDateDialog.show();
+}
+
+dueDateSaveButton.addEventListener('click', () => {
+  if (!dueDateInput.value) {
+      dueDateDialog.show();
+      dueDateInput.setCustomValidity('Choose a valid date.');
+      dueDateInput.reportValidity();
+      return;
+  }
+
+  dueDateDialog.close();
+
+});
+
+function toLocalDateValue(date) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
 
 function resetTextArea(){
   textarea.value='';
@@ -233,7 +280,7 @@ submitButton.addEventListener('click', () => {
     text,
     audio: null,
     tags: [...selectedTags],
-    dueDate: null,
+    dueDate: dueDateInput.value,
     reminders: [],
     attachments: [],
     pinned: false,
@@ -243,7 +290,6 @@ submitButton.addEventListener('click', () => {
     createdAt: now,
     lastModifiedAt: now,
   });
-
   renderAgendaView();
   renderBrowseView();
 

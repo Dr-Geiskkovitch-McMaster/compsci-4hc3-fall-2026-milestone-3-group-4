@@ -157,28 +157,8 @@
             <form slot="content" id="reminder-form" class="reminder-form" method="dialog">
                 <div class="reminder-form-field">
                     <label for="reminder-time">Reminder date and time</label>
-                    <input id="reminder-time" type="datetime-local" required>
+                    <input id="reminder-time" type="date" required>
                 </div>
-                <fieldset class="reminder-frequency">
-                    <legend>Reminder frequency</legend>
-                    <label class="reminder-frequency-option">
-                        <input type="radio" name="reminder-frequency" value="daily">
-                        Daily
-                    </label>
-                    <label class="reminder-frequency-option">
-                        <input type="radio" name="reminder-frequency" value="weekly">
-                        Weekly
-                    </label>
-                    <label class="reminder-frequency-option">
-                        <input type="radio" name="reminder-frequency" value="monthly">
-                        Monthly
-                    </label>
-                </fieldset>
-                <div class="reminder-form-field">
-                    <label for="reminder-occurrences">Reminder occurrences</label>
-                    <input id="reminder-occurrences" type="number" min="1">
-                </div>
-            </form>
             <div slot="actions">
                 <md-text-button id="reminder-cancel" type="button">Cancel</md-text-button>
                 <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
@@ -230,7 +210,7 @@
                 <md-icon-button>
                     <md-icon>add_photo_alternate</md-icon>
                 </md-icon-button>
-                <md-icon-button>
+                <md-icon-button id="reminder-select">
                     <md-icon>target</md-icon>
                 </md-icon-button>
                 <md-icon-button id="tag-select">
@@ -275,6 +255,21 @@
         <div slot="actions">
             <md-text-button form="dialog-form" value="cancel" id="cancel-tag-selection">Cancel</md-text-button>
             <md-filled-button form="dialog-form" value="ok" id="save-tag-selection">Save</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <!-- Dialog for setting reminder information when creating a note -->
+    <md-dialog id="due-date-set">
+        <div slot="headline">Set Due Date</div>
+        <form slot="content" id="due-date-form" class="reminder-form" method="dialog">
+            <div class="due-date-form-field" slot="content">
+                <label for="due-date-input">Due Date</label>
+                <input id="due-date-input" type="date" required>
+            </div>
+        </form>
+        <div slot="actions">
+            <md-text-button id="due-date-cancel" type="button">Cancel</md-text-button>
+            <md-filled-button id="due-date-save" form="due-date-form" value="save">Save</md-filled-button>
         </div>
     </md-dialog>
 

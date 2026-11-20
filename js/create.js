@@ -12,6 +12,8 @@ const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
 const tagsContainer = document.getElementById('textarea-tag-container');
+const addMediaButton = document.getElementById('media-select');
+const favouriteButton = document.getElementById('star-button');
 
 // Tag Selection
 const selectTagButton = document.getElementById('tag-select');
@@ -315,12 +317,26 @@ tagCreateButton.addEventListener('click', () => {
   tagCreateName.value = '';
 });
 
+addMediaButton.addEventListener('click', () => {
+  window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.');
+});
+
+favouriteButton.addEventListener('click', () => {
+  window.showPrototypeModal('Mark as Favourite','This feature would mark your note as a favourite and would be integrated throughout filters in each view.');
+});
 
 
 // save note text when submit button is tapped
 // build a new horizontal card for the note made
 submitButton.addEventListener('click', () => {
 
+  // Check if the current icon on the button is the mic, meaning the user is trying to record audio
+  const submitIconEl = submitButton.querySelector('md-icon'); 
+  const currentIcon = submitIconEl?.textContent.trim();
+  if (currentIcon === 'mic') {
+    window.showPrototypeModal('Record Audio','For this, you would record your voice and the system would attach a transcript to your note.');
+  }
+  
 
   const text = textarea.value.trim();
   if (!text) return;

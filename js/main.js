@@ -6,6 +6,11 @@ import { renderAgendaView } from './agenda.js';
 import { openSpecialView } from './specialView.js';
 import './prototypeModal.js';
 
+// Forces page to reload to today instead of where user was last scrolled
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 renderBrowseView();
 renderAgendaView();
 
@@ -38,6 +43,8 @@ navItems.forEach(item => {
       targetView.style.display = 'block';
       if (targetId === 'browse-view') {
         renderBrowseView();
+      } else if (targetId === 'agenda-view') {
+        renderAgendaView();
       }
     }
   });

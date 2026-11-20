@@ -32,14 +32,19 @@ export function createBrowseCard({ title, icon, openCount, totalCount, color }) 
   return card;
 }
 
-export function createAddCard(ariaLabel, whenClicked = () =>  {}) {
+export function createAddCard(ariaLabel, whenClicked = () =>  {}, textLabel = '') {
   const card = document.createElement('button');
   card.type = 'button';
   card.className = 'm3-card m3-card--compact m3-card--add';
   card.setAttribute('aria-label', ariaLabel);
+  let innerText = ''
+  if (textLabel !== '') {
+    innerText = '<p>' + textLabel + '</p>'
+  }
   card.innerHTML = `
     <md-ripple></md-ripple>
     <md-icon aria-hidden="true">add</md-icon>
+    ${innerText}
   `;
   card.onclick = whenClicked;
   return card;

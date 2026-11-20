@@ -44,7 +44,6 @@ html::-webkit-scrollbar {
 .top-nav-bar {
     position: sticky;
     top: 0;
-    z-index: 1000;
 
     display: flex;
     justify-content: center;
@@ -54,16 +53,16 @@ html::-webkit-scrollbar {
     width: calc(100vw - 48px);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 30;
     background-color: white;
     opacity: 1;
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.top-nav-bar--hidden {
+/* .top-nav-bar--hidden {
     transform: translateY(-100%); 
     opacity: 0;
-}
+} */
 
 .nav-button {
     --md-text-button-icon-color: var(--md-sys-color-on-surface-variant);
@@ -339,7 +338,7 @@ html::-webkit-scrollbar {
 .special-view {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: 50;
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -368,7 +367,12 @@ html::-webkit-scrollbar {
 
 .special-view-title {
     margin: 0;
-    font-size: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
     font-weight: 500;
     color: #1D1B20;
 }
@@ -630,12 +634,16 @@ html::-webkit-scrollbar {
     font-size: 0.75rem;
 }
 
-#agenda-card-container {
-    margin-bottom: 32rem;
+#agenda-view {
+    padding-bottom: calc(100dvh - 500px);
 }
 
 .agenda-day {
     margin-bottom: 2em;
+}
+
+#agenda-today {
+    scroll-margin-top: 84px; /* to give breathing room from topnav */
 }
 
 .today-time-cursor {
@@ -689,4 +697,19 @@ label[for="review-tag"] {
     row-gap: 16px;
     height: 100%;
     min-height: 0;
+#browse-view-all-btn {
+    margin-top: 2em;
+}
+
+.special-view-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.scrim {
+    z-index: 100;
 }

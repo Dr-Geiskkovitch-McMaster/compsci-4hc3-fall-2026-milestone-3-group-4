@@ -12,6 +12,8 @@ const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
 const tagsContainer = document.getElementById('textarea-tag-container');
+const addMediaButton = document.getElementById('media-select');
+const favouriteButton = document.getElementById('star-button');
 
 // Tag Selection
 const selectTagButton = document.getElementById('tag-select');
@@ -33,6 +35,8 @@ const dueDateDialog = document.getElementById('due-date-set');
 const dueDateCancelButton = document.getElementById('due-date-cancel');
 const dueDateSaveButton = document.getElementById('due-date-save');
 const dueDateInput = document.getElementById('due-date-input');
+
+const viewPort = window.visualViewport;
 
 export const tags = [...new Set([...appData.tags])];
 
@@ -97,6 +101,11 @@ fab.addEventListener('click', () => {
   resetTextArea();
   // render the tags for the current note at the bottom of the text area
   renderTextAreaTags();
+
+  // if panel is full screen, change it back to collapsed
+  if (panel.classList.contains('fullscreen')) {
+    toggleFullScreen();
+  }
   textarea.focus();
 });
 
@@ -130,16 +139,19 @@ function renderTextAreaTags() {
 
 }
 
-// trigger expanding the note creation screen
-expandButton.addEventListener('click', () => {
+function toggleFullScreen() {
   panel.classList.toggle('fullscreen');
   const isFullScreen = panel.classList.contains('fullscreen');
-
   expandIcon.textContent = isFullScreen ? 'collapse_content' : 'expand_content';
+  panel.style.removeProperty('bottom');
+  updatePanelPosition(panel);
 
-  if (isFullScreen) {
-    panel.style.bottom = '0px';
-  }
+  textarea.focus();
+}
+
+// trigger expanding the note creation screen
+expandButton.addEventListener('click', () => {
+  toggleFullScreen();
 
 });
 
@@ -150,7 +162,6 @@ function closePanel() {
   textarea.blur(); 
   panel.classList.add('hidden');
   textareaBackdrop.classList.add('hidden');
-  expandIcon.textContent = 'expand_content';
   fab.classList.remove('hidden');
   todayFab.classList.remove('hidden')
   submitButton.innerHTML = '<md-icon>mic</md-icon>';
@@ -306,12 +317,26 @@ tagCreateButton.addEventListener('click', () => {
   tagCreateName.value = '';
 });
 
+addMediaButton.addEventListener('click', () => {
+  window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.');
+});
+
+favouriteButton.addEventListener('click', () => {
+  window.showPrototypeModal('Mark as Favourite','This feature would mark your note as a favourite and would be integrated throughout filters in each view.');
+});
 
 
 // save note text when submit button is tapped
 // build a new horizontal card for the note made
 submitButton.addEventListener('click', () => {
 
+  // Check if the current icon on the button is the mic, meaning the user is trying to record audio
+  const submitIconEl = submitButton.querySelector('md-icon'); 
+  const currentIcon = submitIconEl?.textContent.trim();
+  if (currentIcon === 'mic') {
+    window.showPrototypeModal('Record Audio','For this, you would record your voice and the system would attach a transcript to your note.');
+  }
+  
 
   const text = textarea.value.trim();
   if (!text) return;
@@ -355,17 +380,23 @@ submitButton.addEventListener('click', () => {
   closePanel();
 });
 
-if (window.visualViewport) {
+function updatePanelPosition(panel) {
 
-  // Moves panel to be above the mobile keyboard when add button is tapped
-  const updatePanelPosition = () => {
-  if (panel.classList.contains('hidden') || panel.classList.contains('fullscreen')) return;
-    
-    
-  const keyboardHeight = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-  panel.style.bottom = `${Math.max(0, keyboardHeight)}px`;
+  if (!panel.classList.contains('hidden') || !panel.classList.contains('fullscreen')) {
+    panel.style.removeProperty('--vv-top');
+    panel.style.removeProperty('--vv-left');
+    panel.style.removeProperty('--vv-width');
+    panel.style.removeProperty('--vv-height');
+    return;
   };
 
-  window.visualViewport.addEventListener('resize', updatePanelPosition);
-  window.visualViewport.addEventListener('scroll', updatePanelPosition);
+  if (!viewPort) return;
+
+  panel.style.setProperty('--vv-top', `${vv.offsetTop}px`);
+  panel.style.setProperty('--vv-left', `${vv.offsetLeft}px`);
+  panel.style.setProperty('--vv-width', `${vv.width}px`);
+  panel.style.setProperty('--vv-height', `${vv.height}px`);
 }
+
+viewPort.addEventListener('resize', updatePanelPosition);
+viewPort.addEventListener('scroll', updatePanelPosition);

@@ -9,7 +9,8 @@ function getElements() {
     backBtn: document.getElementById('special-view-back'),
     fabs: [ 
             document.getElementById('add-fab'),
-            document.getElementById('today-fab')
+            document.getElementById('today-fab'),
+            document.getElementById('draft-fab-wrapper')
           ]
   };
 }

@@ -4,6 +4,7 @@ import { renderBrowseView } from "./browse.js";
 
 const fab = document.getElementById('add-fab');
 const todayFab = document.getElementById('today-fab');
+const draftFab = document.getElementById('draft-fab-wrapper');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
 const textareaBackdrop = document.getElementById('text-creation-backdrop');
@@ -33,24 +34,52 @@ let saveCallback = null;
 
 renderAgendaView();
 
+function hideFabs(){
+  fab.classList.add('hidden');
+  todayFab.classList.add('hidden')
+  draftFab.classList.add('hidden')
+}
+
+function showFabs(){
+  fab.classList.remove('hidden');
+  todayFab.classList.remove('hidden')
+  draftFab.classList.remove('hidden')
+}
+
 function resetTextArea(){
   textarea.value='';
   selectedTags.clear();
   sessionTags.clear();
 }
 
+function enableDraftsFab(){
+  draftFab.classList.remove('fab-disabled');
+}
+
+function disableDraftsFab(){
+  draftFab.classList.add('fab-disabled');
+}
+
 // trigger creating a note
 fab.addEventListener('click', () => {
   panel.classList.remove('hidden');
   textareaBackdrop.classList.remove('hidden');
-  fab.classList.add('hidden');
-  todayFab.classList.add('hidden')
+  hideFabs();
 
   // remove any existing text or tags when new note created
   resetTextArea();
   // render the tags for the current note at the bottom of the text area
   renderTextAreaTags();
   textarea.focus();
+});
+
+draftFab.addEventListener('click', () => {
+  window.showPrototypeModal(
+    'Edit Drafts',
+    'Users can see a list of drafts they have and from there quickly delete or edit/save them\n\nWhen you close this pop up, we will hide this fab. It will only appear if a user has drafts they have not submitted/deleted.',
+    'Prototype Limitation',
+    disableDraftsFab
+  )
 });
 
 // change icon to 'submit' when user starts typing
@@ -104,8 +133,7 @@ function closePanel() {
   panel.classList.add('hidden');
   textareaBackdrop.classList.add('hidden');
   expandIcon.textContent = 'expand_content';
-  fab.classList.remove('hidden');
-  todayFab.classList.remove('hidden')
+  showFabs();
   submitButton.innerHTML = '<md-icon>mic</md-icon>';
   panel.style.bottom = '0px';
 }
@@ -175,8 +203,7 @@ export function openNoteEditor(note = null, onSave){
   if (!note){
     panel.classList.remove('hidden');
     textareaBackdrop.classList.remove('hidden');
-    fab.classList.add('hidden');
-    todayFab.classList.add('hidden')
+    hideFabs();
 
     // remove any existing text or tags when new note created
     resetTextArea();
@@ -188,8 +215,7 @@ export function openNoteEditor(note = null, onSave){
     panel.classList.remove('hidden');
     panel.classList.add('fullscreen');
     textareaBackdrop.classList.remove('hidden');
-    fab.classList.add('hidden');
-    todayFab?.classList.add('hidden');
+    hideFabs()
     editingNote = note;
     saveCallback = onSave;
 

@@ -74,6 +74,20 @@ function createDaySection(offset, date, notes, todayKey) {
   return section;
 }
 
+export function scrollToToday() {
+  const agendaView = document.getElementById('agenda-view');
+  if (!agendaView || agendaView.style.display === 'none') return;
+
+  requestAnimationFrame(() => { // TIL one renders before frame, two runs after?? Web dev is weird
+    requestAnimationFrame(() => {
+      document.getElementById('agenda-today')?.scrollIntoView({
+        block: 'start',
+        behavior: 'instant',
+      });
+    });
+  });
+}
+
 export function renderAgendaView() {
   const container = document.getElementById('agenda-card-container');
   if (!container) return;
@@ -94,13 +108,5 @@ export function renderAgendaView() {
 
   container.replaceChildren(fragment);
 
-  const agendaView = document.getElementById('agenda-view');
-  if (agendaView && agendaView.style.display !== 'none') {
-    requestAnimationFrame(() => {
-      document.getElementById('agenda-today')?.scrollIntoView({
-        block: 'start',
-        behavior: 'instant',
-      });
-    });
-  }
+  scrollToToday();
 }

@@ -156,8 +156,28 @@
             <form slot="content" id="reminder-form" class="reminder-form" method="dialog">
                 <div class="reminder-form-field">
                     <label for="reminder-time">Reminder date and time</label>
-                    <input id="reminder-time" type="date" required>
+                    <input id="reminder-time" type="datetime-local" required>
                 </div>
+                <fieldset class="reminder-frequency">
+                    <legend>Reminder frequency</legend>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="daily">
+                        Daily
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="weekly">
+                        Weekly
+                    </label>
+                    <label class="reminder-frequency-option">
+                        <input type="radio" name="reminder-frequency" value="monthly">
+                        Monthly
+                    </label>
+                </fieldset>
+                <div class="reminder-form-field">
+                    <label for="reminder-occurrences">Reminder occurrences</label>
+                    <input id="reminder-occurrences" type="number" min="1">
+                </div>
+            </form>
             <div slot="actions">
                 <md-text-button id="reminder-cancel" type="button">Cancel</md-text-button>
                 <md-filled-button form="reminder-form" value="save">Save</md-filled-button>
@@ -191,12 +211,12 @@
 
         <div id="panel-top" class="panel-top">
             <md-icon-button id="close-button">
-                <md-icon>Close</md-icon>
+                <md-icon>arrow_back</md-icon>
             </md-icon-button>
 
             <div class="panel-top-right">
-                <md-icon-button id="star-button">
-                    <md-icon>Star</md-icon>
+                <md-icon-button id="pin-button">
+                    <md-icon>keep</md-icon>
                 </md-icon-button>
                 <md-icon-button id="expand-button">
                     <md-icon id="expand-icon">expand_content</md-icon>
@@ -222,8 +242,11 @@
                 <md-icon-button onclick="window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.')">
                     <md-icon id="media-select">add_photo_alternate</md-icon>
                 </md-icon-button>
-                <md-icon-button id="reminder-select">
+                <md-icon-button id="due-date-select">
                     <md-icon>target</md-icon>
+                </md-icon-button>
+                <md-icon-button id="reminder-select">
+                    <md-icon>schedule</md-icon>
                 </md-icon-button>
                 <md-icon-button id="tag-select">
                     <md-icon>tag</md-icon>
@@ -284,7 +307,7 @@
     <!-- Dialog for setting reminder information when creating a note -->
     <md-dialog id="due-date-set">
         <div slot="headline">Set Due Date</div>
-        <form slot="content" id="due-date-form" class="reminder-form" method="dialog">
+        <form slot="content" id="due-date-form" class="due-date-form" method="dialog">
             <div class="due-date-form-field" slot="content">
                 <label for="due-date-input">Due Date</label>
                 <input id="due-date-input" type="date" required>

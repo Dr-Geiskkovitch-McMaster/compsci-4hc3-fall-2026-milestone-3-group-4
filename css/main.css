@@ -263,9 +263,15 @@ html::-webkit-scrollbar {
     background: var(--md-sys-color-surface-container); 
     min-width: 100px;
     font: inherit;
-    font-size: smaller;
 }
 
+input,
+textarea,
+select,
+#note-tag,
+#created-tag {
+  font-size: 16px;
+}
 
 
 #note-tag {
@@ -275,7 +281,6 @@ html::-webkit-scrollbar {
     outline: 0;
     background: transparent;
     font: inherit;
-    font-size: smaller;
 }
 
 .bottom-icons {

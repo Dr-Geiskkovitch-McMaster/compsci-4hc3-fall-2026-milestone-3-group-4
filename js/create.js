@@ -7,7 +7,7 @@ const todayFab = document.getElementById('today-fab');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
 const textareaBackdrop = document.getElementById('text-creation-backdrop');
-const backButton = document.getElementById('close-button');
+const closeButton = document.getElementById('close-button');
 const submitButton = document.getElementById('submit-button');
 const expandButton = document.getElementById('expand-button');
 const expandIcon = document.getElementById('expand-icon');
@@ -175,7 +175,7 @@ function closePanel() {
   panel.style.bottom = '0px';
 }
 
-backButton.addEventListener('click', closePanel);
+closeButton.addEventListener('click', closePanel);
 textareaBackdrop.addEventListener('click', closePanel);
 
 // open tag panel when tag select button is tapped

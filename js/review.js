@@ -3,6 +3,7 @@ import { openNoteEditor } from './create.js';
 import appData, { getColorPair } from './data.js';
 import { renderAgendaView } from './agenda.js';
 import { renderBrowseView } from './browse.js';
+import { formatDeadlineBadge } from './cards.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
@@ -378,7 +379,21 @@ function showCurrentNote(state) {
     });
     // draw due date on the note
     state.noteDueDate.textContent = currentNote.dueDate ? `Due ${currentNote.dueDate}` : '';
-    
+    if (currentNote.dueDate) {
+        const { text, overdue } = formatDeadlineBadge(currentNote.dueDate);
+        const icon = document.createElement('md-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = 'target';
+
+        state.noteDueDate.classList.add('note-preview-deadline');
+        state.noteDueDate.classList.toggle('note-preview-deadline--overdue', overdue);
+        state.noteDueDate.replaceChildren(icon, text);
+    } else {
+        state.noteDueDate.textContent = '';
+        state.noteDueDate.classList.remove('note-preview-deadline');
+    }
+
+
     state.backNote.hidden = state.noteQueue.slice(state.noteIndex + 1)
         .every(queuedNote => queuedNote.resolved);
 }

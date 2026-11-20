@@ -3,6 +3,7 @@ import { renderAgendaView } from "./agenda.js";
 import { renderBrowseView } from "./browse.js";
 
 const fab = document.getElementById('add-fab');
+const todayFab = document.getElementById('today-fab');
 const panel = document.getElementById('text-creation-panel');
 const textarea = document.getElementById('text-creation-textarea');
 const textareaBackdrop = document.getElementById('text-creation-backdrop');
@@ -43,6 +44,7 @@ fab.addEventListener('click', () => {
   panel.classList.remove('hidden');
   textareaBackdrop.classList.remove('hidden');
   fab.classList.add('hidden');
+  todayFab.classList.add('hidden')
 
   // remove any existing text or tags when new note created
   resetTextArea();
@@ -103,6 +105,7 @@ function closePanel() {
   textareaBackdrop.classList.add('hidden');
   expandIcon.textContent = 'expand_content';
   fab.classList.remove('hidden');
+  todayFab.classList.remove('hidden')
   submitButton.innerHTML = '<md-icon>mic</md-icon>';
   panel.style.bottom = '0px';
 }
@@ -173,6 +176,7 @@ export function openNoteEditor(note = null, onSave){
     panel.classList.remove('hidden');
     textareaBackdrop.classList.remove('hidden');
     fab.classList.add('hidden');
+    todayFab.classList.add('hidden')
 
     // remove any existing text or tags when new note created
     resetTextArea();
@@ -185,6 +189,7 @@ export function openNoteEditor(note = null, onSave){
     panel.classList.add('fullscreen');
     textareaBackdrop.classList.remove('hidden');
     fab.classList.add('hidden');
+    todayFab?.classList.add('hidden');
     editingNote = note;
     saveCallback = onSave;
 

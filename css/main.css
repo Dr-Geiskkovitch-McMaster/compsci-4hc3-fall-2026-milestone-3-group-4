@@ -715,3 +715,10 @@ label[for="review-tag"] {
 .scrim {
     z-index: 100;
 }
+
+.today-button {
+    position: fixed;
+    bottom: 90px;
+    left: 24px;
+    z-index: 1000;
+}

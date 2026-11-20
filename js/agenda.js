@@ -74,7 +74,7 @@ function createDaySection(offset, date, notes, todayKey) {
   return section;
 }
 
-export function scrollToToday() {
+export function scrollToToday(behavior = 'instant') {
   const agendaView = document.getElementById('agenda-view');
   if (!agendaView || agendaView.style.display === 'none') return;
 
@@ -82,7 +82,7 @@ export function scrollToToday() {
     requestAnimationFrame(() => {
       document.getElementById('agenda-today')?.scrollIntoView({
         block: 'start',
-        behavior: 'instant',
+        behavior: behavior,
       });
     });
   });

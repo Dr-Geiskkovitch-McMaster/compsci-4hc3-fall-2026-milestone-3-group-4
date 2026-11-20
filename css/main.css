@@ -608,6 +608,13 @@ html::-webkit-scrollbar {
 
 }
 
+.undo-button {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    z-index: 101;
+}
+
 .note-tags {
     position: absolute;
     bottom: 16px;
@@ -658,4 +665,28 @@ html::-webkit-scrollbar {
 
 label[for="review-tag"] {
     font-size: 1.25rem;
+}
+
+.special-view--review {
+    overflow: hidden;
+}
+
+.special-view--review .special-view-body {
+    padding: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.special-view--review #active-review {
+    flex: 1;
+    min-height: 0;
+}
+
+.special-view--review .review-block {
+    min-height: 0;
+    align-content: start;
+    row-gap: 16px;
+    height: 100%;
+    min-height: 0;
 }

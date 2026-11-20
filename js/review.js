@@ -10,7 +10,7 @@ function getNoteTags(note) {
     if (note.open && note.dueDate && dateSoon(new Date(note.dueDate),2)){
         updatedTags.push('due');
     }
-    
+
     return updatedTags;
 }
 
@@ -48,6 +48,7 @@ export function initializeReview() {
     const reminderInput = document.querySelector('#reminder-time');
     const reminderFrequencies = document.querySelectorAll('input[name="reminder-frequency"]');
     const reminderOccurrences = document.querySelector('#reminder-occurrences');
+    const undoReview = document.querySelector('#undo-fab');
 
     const tagSearch = reviewView.querySelector('#review-tag');
     const tagOptions = reviewView.querySelector('#review-tag-options');
@@ -101,7 +102,9 @@ export function initializeReview() {
         newStackInput,
         saveNewStackDialog,
         swipeHint,
-        feedbackTimeout: undefined
+        feedbackTimeout: undefined,
+        undoReview,
+        pastReviews: []
     };
 
     state.transitionHandler = event => handleTransitionEnd(state, event);
@@ -245,6 +248,30 @@ export function initializeReview() {
         state.pointerId = undefined;
     });
 
+    // undo button listener
+    state.undoReview.addEventListener('click', () => {
+        const previous = state.pastReviews.pop();
+        if (!previous) return;
+
+        if (previous.undoResolve) {
+            state.noteQueue[previous.index].resolved = false;
+        }
+        
+        state.noteIndex = previous.index;
+        state.note.removeEventListener('transitionend', state.transitionHandler);
+        state.note.style.transition = 'none';
+        state.note.style.transform = 'none';
+        state.note.style.backgroundColor = '';
+        showCurrentNote(state);
+        if (state.pastReviews.length === 0) {
+            state.undoReview.classList.add('hidden');
+        }
+        displayFeedbackText(state, 'Action reversed');
+
+        void state.note.offsetWidth; // Apply the reset before restoring the transition
+        state.note.style.transition = '';
+    });
+
     state.saveNewStack.addEventListener('click', () => {
         openNewStackDialog(state);
     });
@@ -271,6 +298,8 @@ export function initializeReview() {
 
     /** accessible by main.js, function to set which stack is reviewed */
     function setStack(selectedStack){
+        state.pastReviews.length = 0;
+        state.undoReview.classList.add('hidden');
         if (selectedStack === "new-stack-button"){
             createNewStack(state);
         } else {
@@ -365,6 +394,9 @@ function updateNoteQueue(state) {
     }
 
     state.noteIndex = 0;
+    state.pastReviews.length = 0;
+    state.undoReview.classList.add('hidden');
+
     showCurrentNote(state);
 }
 
@@ -458,11 +490,24 @@ function dateSoon(date,threshold) {
 }
 
 function showSwipeFeedback(state, direction, color) {
+    console.log(state.pastReviews);
     if (direction === 'left'){
         displayFeedbackText(state,'Note dismissed');
+        state.undoReview.classList.remove('hidden');
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: false
+        })
     } else if (direction === 'right'){
         displayFeedbackText(state,'Note resolved');
         state.noteQueue[state.noteIndex].resolved = true;
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: true
+        })
+        state.undoReview.classList.remove('hidden');
     } else if (direction === 'up') {
         displayFeedbackText(state,'Change reminder');
         openReminderDialog(state);

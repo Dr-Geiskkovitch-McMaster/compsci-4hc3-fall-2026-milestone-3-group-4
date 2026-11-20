@@ -121,14 +121,14 @@ html::-webkit-scrollbar {
 
 .add-button {
     position: fixed;
-    bottom: 90px;
+    bottom: calc(90px + var(--fullscreen-bar-height, 36px));
     right: 24px;
     z-index: 1000;
 }
 
 .draft-button {
     position: fixed;
-    bottom: 160px;
+    bottom: calc(160px + var(--fullscreen-bar-height, 36px));
     right: 24px;
     z-index: 1000;
 }
@@ -326,17 +326,50 @@ select,
     gap: 4px;
 }
 
+body.is-fullscreen {
+    --fullscreen-bar-height: 0px;
+}
+
 .bottom-nav-bar {
     position: fixed;
-    bottom: 0 ;
+    bottom: var(--fullscreen-bar-height, 36px);
     left: 0;
     right: 0;
-    height: 70px;
+    height: 64px;
     background-color: var(--md-sys-color-surface-container);
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 5;
+}
+
+.fullscreen-bar[hidden] {
+    display: none;
+}
+
+.fullscreen-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: #E6E0E9;
+    color: var(--md-sys-color-on-surface-variant);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.fullscreen-bar md-icon {
+    --md-icon-size: 18px;
 }
 
 .nav-label {
@@ -838,7 +871,7 @@ label[for="review-tag"] {
 
 .today-button {
     position: fixed;
-    bottom: 90px;
+    bottom: calc(90px + var(--fullscreen-bar-height, 36px));
     left: 24px;
     z-index: 1000;
 }

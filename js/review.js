@@ -19,7 +19,7 @@ export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
 export const stacks = [
     { name: "Open Loops", tags: ['open'], type: 'filter', iconClass: 'note-preview-status-icon--open' },
     { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
-    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
+    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'target'},
 
     ...tags
         .filter(tag => tag !== 'open' && tag !== 'due')

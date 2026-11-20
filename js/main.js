@@ -131,15 +131,20 @@ reviewStacks.forEach(renderStacks);
 
 const activeReview = document.querySelector('#active-review');
 const stacks = document.querySelectorAll('.stack-button');
+const undoReview = document.querySelector('#undo-fab');
+const specialView = document.querySelector('#special-view');
 
 function openStack(stack){
   activeReview.hidden = false;
   review.setStack(stack.tags);
+  specialView.classList.add('special-view--review');
   openSpecialView({
     title: stack.name,
     content: activeReview,
     onClose: () => {
       activeReview.hidden = true;
+      undoReview.classList.add('hidden');
+      specialView.classList.remove('special-view--review');
       updateStackCount();
       review.clearTags();
     },

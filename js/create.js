@@ -132,6 +132,11 @@ function renderTextAreaTags() {
     chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
     chip.style.color = palette.accent;
     chip.setAttribute('aria-label', `Remove ${tagText} tag`);
+    chip.addEventListener('click', () => {
+      selectedTags.delete(tagText);
+      sessionTags.delete(tagText);
+      renderTextAreaTags();
+    });
 
     return chip;
   });

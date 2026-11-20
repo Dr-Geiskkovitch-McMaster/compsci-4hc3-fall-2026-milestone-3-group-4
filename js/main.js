@@ -19,6 +19,15 @@ const navItems = document.querySelectorAll('.nav-item');
 const views = document.querySelectorAll('.app-view');
 const topNav = document.querySelector('.top-nav-bar');
 
+const topNavMenu = document.getElementById('top-nav-menu');
+topNavMenu.addEventListener('click', () => showPrototypeModal('topNavMenu'));
+
+const avatarMenu = document.getElementById('top-nav-avatar');
+avatarMenu.addEventListener('click', () => showPrototypeModal('topNavAvatar'));
+
+const searchBar = document.getElementById('notes-search');
+searchBar.addEventListener('click', () => showPrototypeModal('searchBar'));
+
 let lastScrollY = window.scrollY;
 
 const review = initializeReview();

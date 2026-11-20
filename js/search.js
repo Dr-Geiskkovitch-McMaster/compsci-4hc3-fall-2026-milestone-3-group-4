@@ -1,4 +1,4 @@
-const searchInput = document.querySelector("#note-search");
+const searchInput = document.querySelector("#notes-search");
 const searchPanel = document.querySelector("#search-panel");
 const clearButton = document.querySelector("#clear-search");
 

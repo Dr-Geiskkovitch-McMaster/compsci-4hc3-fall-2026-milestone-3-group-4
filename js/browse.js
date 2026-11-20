@@ -3,6 +3,40 @@ import { openSpecialView } from './specialView.js';
 import { createAddCard, createBrowseCard, createNoteCard } from './cards.js'
 import { matchesFilter } from './filters.js';
 
+function buildNotesSection(title, iconName, notes, header = true, first = false) {
+  const details = document.createElement('details');
+  details.open = true;
+  details.className = 'browse-section';
+
+  const summary = document.createElement('summary');
+  summary.className = first ? 'm3-hr m3-hr--first' : 'm3-hr';
+
+  const icon = document.createElement('md-icon');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = iconName;
+
+  const subtitle = document.createElement('span');
+  subtitle.className = 'm3-hr-subtitle';
+  subtitle.textContent = title;
+
+  const chevron = document.createElement('md-icon');
+  chevron.className = 'browse-section-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.textContent = 'expand_more';
+
+  summary.append(icon, subtitle, chevron);
+
+  const list = document.createElement('div');
+  list.className = 'card-list';
+  for (const note of notes) {
+    list.appendChild(createNoteCard(note, '12em'));
+  }
+
+  details.append(summary, list);
+
+  return header ? details : list;
+}
+
 function buildNotesContent(notes) {
   if (notes.length === 0) {
     const empty = document.createElement('p');
@@ -11,12 +45,56 @@ function buildNotesContent(notes) {
     return empty;
   }
 
+  const notesSorted = [...notes].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const pinnedNotes = notesSorted.filter(note => note.pinned);
+  const unpinnedNotes = notesSorted.filter(note => !note.pinned);
+
+  let atLeastOnePinned = pinnedNotes.length > 0
+
   const fragment = document.createDocumentFragment();
-  for (const note of notes) {
-    const card = createNoteCard(note, '12em');
-    fragment.appendChild(card);
+  if (pinnedNotes.length > 0) {
+    fragment.appendChild(buildNotesSection('Pinned', 'push_pin', pinnedNotes, true, true));
+  }
+  if (unpinnedNotes.length > 0) {
+    fragment.appendChild(buildNotesSection('Unpinned', 'notes', unpinnedNotes, atLeastOnePinned));
   }
   return fragment;
+}
+
+function createHeaderActionButton(iconName, label, feature, context) {
+  const btn = document.createElement('md-icon-button');
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+
+  const icon = document.createElement('md-icon');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = iconName;
+
+  btn.appendChild(icon);
+  btn.addEventListener('click', () => {
+    window.showPrototypeModal(feature, context);
+  });
+  return btn;
+}
+
+function buildBrowseHeaderActions() {
+  return [
+    createHeaderActionButton(
+      'filter_alt',
+      'Filter notes',
+      'Filter Notes',
+      'This would allow users to apply additional filter criteria within the current Browse list.'
+    ),
+    createHeaderActionButton(
+      'workspaces',
+      'Group notes by',
+      'Group By',
+      'This would allow users to group notes by tag, due date, status, or creation date.'
+    )
+  ];
 }
 
 export function renderBrowseView() {
@@ -34,6 +112,7 @@ export function renderBrowseView() {
     viewAllBtn.onclick = () => {
       openSpecialView({
         title: 'View All',
+        headerActions: buildBrowseHeaderActions(),
         content: buildNotesContent(activeNotes)
       });
     };
@@ -43,7 +122,8 @@ export function renderBrowseView() {
   const filtersList = document.getElementById('browse-filters-list');
   if (filtersList) {
     filtersList.replaceChildren();
-    for (const filter of appData.filters) {
+    const sortedFilters = [...appData.filters].sort((a, b) => a.name.localeCompare(b.name));
+    for (const filter of sortedFilters) {
       const matched = activeNotes.filter(note => matchesFilter(note, filter.criteria));
       const card = createBrowseCard({
         title: filter.name,
@@ -56,12 +136,23 @@ export function renderBrowseView() {
       card.addEventListener('click', () => {
         openSpecialView({
           title: filter.name,
+          headerActions: buildBrowseHeaderActions(),
           content: buildNotesContent(matched)
         });
       });
       filtersList.appendChild(card);
     }
-    filtersList.appendChild(createAddCard('Create new filter'));
+    filtersList.appendChild(
+      createAddCard(
+        'Create new filter',
+        () => {
+          window.showPrototypeModal(
+            'Add Filter via Browse', 'This would allow users to set up new custom filter objects which can be used in both browse and review.'
+          )
+        },
+        'New Filter'
+      )
+    )
   }
 
   // Render Tags
@@ -83,11 +174,22 @@ export function renderBrowseView() {
       card.addEventListener('click', () => {
         openSpecialView({
           title: "#" + tagName,
+          headerActions: buildBrowseHeaderActions(),
           content: buildNotesContent(matched)
         });
       });
       tagsList.appendChild(card);
     }
-    tagsList.appendChild(createAddCard('Create new tag'));
+    tagsList.appendChild(
+      createAddCard(
+        'Create new tag',
+        () => {
+          window.showPrototypeModal(
+            'Add Tag via Browse', 'This would allow users to set up new custom tags which can be used in both browse, create, and review.'
+          )
+        },
+        'New Tag'
+      )
+    )
   }
 }

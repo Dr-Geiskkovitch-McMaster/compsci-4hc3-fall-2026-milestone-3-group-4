@@ -1,5 +1,9 @@
 const swipeThreshold = 150;
+import { openNoteEditor } from './create.js';
 import appData, { getColorPair } from './data.js';
+import { renderAgendaView } from './agenda.js';
+import { renderBrowseView } from './browse.js';
+import { formatDeadlineBadge } from './cards.js';
 
 function getNoteTags(note) {
     const updatedTags = note.tags?.length ? [...note.tags] : ['untagged'];
@@ -7,7 +11,7 @@ function getNoteTags(note) {
     if (note.open && note.dueDate && dateSoon(new Date(note.dueDate),2)){
         updatedTags.push('due');
     }
-    
+
     return updatedTags;
 }
 
@@ -15,7 +19,7 @@ export const tags = [...new Set([...appData.notes.flatMap(getNoteTags)])];
 export const stacks = [
     { name: "Open Loops", tags: ['open'], type: 'filter', iconClass: 'note-preview-status-icon--open' },
     { name: "Untagged", tags: ['untagged'], type: 'filter', icon: 'label_off' },
-    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'schedule'},
+    { name: "Due Soon", tags: ['due'], type: 'filter', icon: 'target'},
 
     ...tags
         .filter(tag => tag !== 'open' && tag !== 'due')
@@ -45,6 +49,7 @@ export function initializeReview() {
     const reminderInput = document.querySelector('#reminder-time');
     const reminderFrequencies = document.querySelectorAll('input[name="reminder-frequency"]');
     const reminderOccurrences = document.querySelector('#reminder-occurrences');
+    const undoReview = document.querySelector('#undo-fab');
 
     const tagSearch = reviewView.querySelector('#review-tag');
     const tagOptions = reviewView.querySelector('#review-tag-options');
@@ -98,7 +103,9 @@ export function initializeReview() {
         newStackInput,
         saveNewStackDialog,
         swipeHint,
-        feedbackTimeout: undefined
+        feedbackTimeout: undefined,
+        undoReview,
+        pastReviews: []
     };
 
     state.transitionHandler = event => handleTransitionEnd(state, event);
@@ -242,6 +249,30 @@ export function initializeReview() {
         state.pointerId = undefined;
     });
 
+    // undo button listener
+    state.undoReview.addEventListener('click', () => {
+        const previous = state.pastReviews.pop();
+        if (!previous) return;
+
+        if (previous.undoResolve) {
+            state.noteQueue[previous.index].resolved = false;
+        }
+        
+        state.noteIndex = previous.index;
+        state.note.removeEventListener('transitionend', state.transitionHandler);
+        state.note.style.transition = 'none';
+        state.note.style.transform = 'none';
+        state.note.style.backgroundColor = '';
+        showCurrentNote(state);
+        if (state.pastReviews.length === 0) {
+            state.undoReview.classList.add('hidden');
+        }
+        displayFeedbackText(state, 'Action reversed');
+
+        void state.note.offsetWidth; // Apply the reset before restoring the transition
+        state.note.style.transition = '';
+    });
+
     state.saveNewStack.addEventListener('click', () => {
         openNewStackDialog(state);
     });
@@ -268,6 +299,8 @@ export function initializeReview() {
 
     /** accessible by main.js, function to set which stack is reviewed */
     function setStack(selectedStack){
+        state.pastReviews.length = 0;
+        state.undoReview.classList.add('hidden');
         if (selectedStack === "new-stack-button"){
             createNewStack(state);
         } else {
@@ -338,7 +371,7 @@ function showCurrentNote(state) {
             const tagData = appData.tags.find(item => item.name === tag);
             const palette = getColorPair(tagData.color);
             chip.className = 'note-tag';
-            chip.textContent = tagData.name;
+            chip.textContent = `#${tagData.name}`;
             chip.style.backgroundColor = palette.container;
             chip.style.color = palette.accent;
             state.noteTags.append(chip);
@@ -346,7 +379,21 @@ function showCurrentNote(state) {
     });
     // draw due date on the note
     state.noteDueDate.textContent = currentNote.dueDate ? `Due ${currentNote.dueDate}` : '';
-    
+    if (currentNote.dueDate) {
+        const { text, overdue } = formatDeadlineBadge(currentNote.dueDate);
+        const icon = document.createElement('md-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = 'target';
+
+        state.noteDueDate.classList.add('note-preview-deadline');
+        state.noteDueDate.classList.toggle('note-preview-deadline--overdue', overdue);
+        state.noteDueDate.replaceChildren(icon, text);
+    } else {
+        state.noteDueDate.textContent = '';
+        state.noteDueDate.classList.remove('note-preview-deadline');
+    }
+
+
     state.backNote.hidden = state.noteQueue.slice(state.noteIndex + 1)
         .every(queuedNote => queuedNote.resolved);
 }
@@ -362,6 +409,9 @@ function updateNoteQueue(state) {
     }
 
     state.noteIndex = 0;
+    state.pastReviews.length = 0;
+    state.undoReview.classList.add('hidden');
+
     showCurrentNote(state);
 }
 
@@ -401,7 +451,7 @@ function renderTagPicker(state) {
         option.style.backgroundColor = palette?.container ?? '#E5E5E5';
         option.style.color = palette?.accent ?? '#000000';
         option.className = 'tag-option';
-        option.textContent = tag;
+        option.textContent = `#${tag}`;
         option.addEventListener('click', () => {
             selectTag(state,tag);
         });
@@ -416,7 +466,7 @@ function renderTagPicker(state) {
         const palette = getColorPair(tagData?.color);
         chip.type = 'button';
         chip.className = 'selected-tag';
-        chip.textContent = `${tag} ×`;
+        chip.textContent = `#${tag} ×`;
         chip.style.backgroundColor = palette?.container ?? '#E5E5E5';
         chip.style.color = palette.accent;
         chip.setAttribute('aria-label', `Remove ${tag} tag`);
@@ -455,17 +505,37 @@ function dateSoon(date,threshold) {
 }
 
 function showSwipeFeedback(state, direction, color) {
+    console.log(state.pastReviews);
     if (direction === 'left'){
         displayFeedbackText(state,'Note dismissed');
+        state.undoReview.classList.remove('hidden');
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: false
+        })
     } else if (direction === 'right'){
         displayFeedbackText(state,'Note resolved');
         state.noteQueue[state.noteIndex].resolved = true;
+        state.pastReviews.push({
+            note: state.noteQueue[state.noteIndex],
+            index: state.noteIndex,
+            undoResolve: true
+        })
+        state.undoReview.classList.remove('hidden');
     } else if (direction === 'up') {
         displayFeedbackText(state,'Change reminder');
         openReminderDialog(state);
         return;
     } else if (direction == 'down'){
         displayFeedbackText(state,'Editing note');
+        openNoteEditor(state.noteQueue[state.noteIndex],
+            () => {
+                updateNoteQueue(state);
+                renderAgendaView();
+                renderBrowseView();
+            });
+        return;
     }
 
     state.note.style.backgroundColor = color;

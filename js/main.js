@@ -2,7 +2,14 @@
 import appData, { getColorPair } from './data.js';
 import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
-import { renderAgendaView } from './agenda.js';
+import { renderAgendaView, scrollToToday } from './agenda.js';
+import { openSpecialView } from './specialView.js';
+import './prototypeModal.js';
+
+// Forces page to reload to today instead of where user was last scrolled
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
 
 renderBrowseView();
 renderAgendaView();
@@ -14,10 +21,9 @@ const topNav = document.querySelector('.top-nav-bar');
 
 let lastScrollY = window.scrollY;
 
-const topNavBar = document.querySelector('.top-nav-bar');
-const bottomNavBar = document.querySelector('.bottom-nav-bar');
-
 const review = initializeReview();
+
+document.getElementById('today-fab')?.addEventListener('click', () => scrollToToday('smooth'));
 
 navItems.forEach(item => {
   item.addEventListener('click', () => {
@@ -37,32 +43,38 @@ navItems.forEach(item => {
     const targetView = document.getElementById(targetId);
     if (targetView) {
       targetView.style.display = 'block';
-      if (targetId === 'browse-view') {
-        renderBrowseView();
+      if (targetId === 'agenda-view') {
+        renderAgendaView();
+      } else {
+        if (targetId === 'browse-view') {
+          renderBrowseView();
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top for browse and review
       }
     }
   });
 });
 
-window.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY;
-  // Always show at the very top of the page (handles iOS/trackpad bounce)
-  if (currentScrollY <= 0) {
-    topNav.classList.remove('top-nav-bar--hidden');
-    lastScrollY = 0;
-    return;
-  }
-  // Ignore tiny scroll jitter
-  if (Math.abs(currentScrollY - lastScrollY) < 6) return;
-  if (currentScrollY > lastScrollY && currentScrollY > topNav.offsetHeight) {
-    // Scrolling down
-    topNav.classList.add('top-nav-bar--hidden');
-  } else {
-    // Scrolling up
-    topNav.classList.remove('top-nav-bar--hidden');
-  }
-  lastScrollY = currentScrollY;
-}, { passive: true });
+// // Currently disabled 
+// window.addEventListener('scroll', () => {
+//   const currentScrollY = window.scrollY;
+//   // Always show at the very top of the page (handles iOS/trackpad bounce)
+//   if (currentScrollY <= 0) {
+//     topNav.classList.remove('top-nav-bar--hidden');
+//     lastScrollY = 0;
+//     return;
+//   }
+//   // Ignore tiny scroll jitter
+//   if (Math.abs(currentScrollY - lastScrollY) < 6) return;
+//   if (currentScrollY > lastScrollY && currentScrollY > topNav.offsetHeight) {
+//     // Scrolling down
+//     topNav.classList.add('top-nav-bar--hidden');
+//   } else {
+//     // Scrolling up
+//     topNav.classList.remove('top-nav-bar--hidden');
+//   }
+//   lastScrollY = currentScrollY;
+// }, { passive: true });
 /* REVIEW CODE */
 
 /* generate stacks based on stack array */
@@ -119,24 +131,40 @@ function renderStacks(stack) {
 
 reviewStacks.forEach(renderStacks);
 
-const reviewHome = document.querySelector('#review-home');
 const activeReview = document.querySelector('#active-review');
 const stacks = document.querySelectorAll('.stack-button');
+const undoReview = document.querySelector('#undo-fab');
+const specialView = document.querySelector('#special-view');
 
 function openStack(stack){
-  reviewHome.hidden = true;
   activeReview.hidden = false;
-  topNavBar.classList.add('review-mode');
-  bottomNavBar.classList.add('review-mode');
   review.setStack(stack.tags);
+  specialView.classList.add('special-view--review');
+  openSpecialView({
+    title: stack.name,
+    content: activeReview,
+    onClose: () => {
+      activeReview.hidden = true;
+      undoReview.classList.add('hidden');
+      specialView.classList.remove('special-view--review');
+      updateStackCount();
+      review.clearTags();
+    },
+  });
 }
 
 document.querySelector('#new-stack-button').addEventListener('click', () => {
-  reviewHome.hidden = true;
   activeReview.hidden = false;
-  topNavBar.classList.add('review-mode');
-  bottomNavBar.classList.add('review-mode');
   review.setStack('new-stack-button');
+  openSpecialView({
+    title: 'New Stack',
+    content: activeReview,
+    onClose: () => {
+      activeReview.hidden = true;
+      updateStackCount();
+      review.clearTags();
+    },
+  });
 });
 
 function updateStackCount() {
@@ -146,14 +174,7 @@ function updateStackCount() {
   });
 }
 
-document.querySelector('#exit-review').addEventListener('click', () => {
-  reviewHome.hidden = false;
-  activeReview.hidden = true;
-  topNavBar.classList.remove('review-mode');
-  bottomNavBar.classList.remove('review-mode');
-  updateStackCount();
-  review.clearTags();
-});
+document.addEventListener('note-created', updateStackCount);
 
 document.addEventListener('stack-created', event => {
   renderStacks(event.detail);

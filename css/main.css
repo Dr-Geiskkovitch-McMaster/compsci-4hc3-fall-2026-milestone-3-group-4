@@ -38,13 +38,12 @@ html::-webkit-scrollbar {
 }
 
 .app-view {
-    margin: 0 16px 86px;
+    margin: 0 16px calc(86px + 5rem);
 }
 
 .top-nav-bar {
     position: sticky;
     top: 0;
-    z-index: 1000;
 
     display: flex;
     justify-content: center;
@@ -54,19 +53,16 @@ html::-webkit-scrollbar {
     width: calc(100vw - 48px);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 30;
     background-color: white;
     opacity: 1;
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.top-nav-bar--hidden {
+/* .top-nav-bar--hidden {
     transform: translateY(-100%); 
     opacity: 0;
-}
-.top-nav-bar.review-mode {
-    display: none;
-}
+} */
 
 .nav-button {
     --md-text-button-icon-color: var(--md-sys-color-on-surface-variant);
@@ -284,10 +280,6 @@ html::-webkit-scrollbar {
     z-index: 5;
 }
 
-.bottom-nav-bar.review-mode {
-    display: none;
-}
-
 .nav-label {
     font-size: 12px;
     font-family: var(--md-ref-typeface-brand);
@@ -346,7 +338,7 @@ html::-webkit-scrollbar {
 .special-view {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: 50;
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -375,7 +367,12 @@ html::-webkit-scrollbar {
 
 .special-view-title {
     margin: 0;
-    font-size: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
     font-weight: 500;
     color: #1D1B20;
 }
@@ -462,7 +459,6 @@ html::-webkit-scrollbar {
     display: grid;
     place-items: center;
     min-height: 80vh;
-    padding-top: 72px;
 }
 
 .reminder-form {
@@ -534,11 +530,9 @@ html::-webkit-scrollbar {
     font-size: smaller;
 }
 
-.note-due-date {
-    position: absolute;
-    color: var(--md-sys-color-on-surface-variant);
-    right: 16px;
-    bottom: 16px;
+.sticky-note--front .note-preview-deadline {
+    top: 8px;
+    right: 8px;
 }
 
 .tag-options,
@@ -574,24 +568,6 @@ html::-webkit-scrollbar {
 
 .selected-tag {
     background: var(--md-sys-color-primary-container);
-}
-
-.top-button-review {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 2;
-}
-
-#exit-review {
-    border: none;
-    font-size: 40px;
-    font-family: 'Trebuchet MS';
-    background-color: transparent;
 }
 
 .note-stack{
@@ -634,6 +610,13 @@ html::-webkit-scrollbar {
 
 }
 
+.undo-button {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    z-index: 101;
+}
+
 .note-tags {
     position: absolute;
     bottom: 16px;
@@ -649,12 +632,16 @@ html::-webkit-scrollbar {
     font-size: 0.75rem;
 }
 
-#agenda-card-container {
-    margin-bottom: 32rem;
+#agenda-view {
+    padding-bottom: calc(100dvh - 500px);
 }
 
 .agenda-day {
     margin-bottom: 2em;
+}
+
+#agenda-today {
+    scroll-margin-top: 84px; /* to give breathing room from topnav */
 }
 
 .today-time-cursor {
@@ -684,4 +671,52 @@ html::-webkit-scrollbar {
 
 label[for="review-tag"] {
     font-size: 1.25rem;
+}
+
+.special-view--review {
+    overflow: hidden;
+}
+
+.special-view--review .special-view-body {
+    padding: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.special-view--review #active-review {
+    flex: 1;
+    min-height: 0;
+}
+
+.special-view--review .review-block {
+    min-height: 0;
+    align-content: start;
+    row-gap: 16px;
+    height: 100%;
+    min-height: 0;
+}
+
+#browse-view-all-btn {
+    margin-top: 2em;
+}
+
+.special-view-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.scrim {
+    z-index: 100;
+}
+
+.today-button {
+    position: fixed;
+    bottom: 90px;
+    left: 24px;
+    z-index: 1000;
 }

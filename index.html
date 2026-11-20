@@ -89,6 +89,9 @@
     <main id="agenda-view" class="app-view">
         <section class="section-group">
             <div id="agenda-card-container"></div>
+            <md-fab size="small" variant="secondary" id="today-fab" class="today-button" aria-label="Jump to today">
+                <md-icon slot="icon">today</md-icon>
+            </md-fab>
         </section>
     </main>
 
@@ -110,10 +113,6 @@
         </section>
         
         <section id="active-review" hidden>
-            <div class="top-button-review">
-                <label for="review-tag">Review by Tag(s)</label>
-                <button id="exit-review" aria-label="Exit review">×</button>
-            </div>
             <div class="review-block">
                 <div class="tag-picker">
                     <div class="tag-input-container">
@@ -167,6 +166,11 @@
 
     </main>
 
+    <!-- Fab button to undo review action -->
+    <md-fab variant="primary" id="undo-fab" class="undo-button hidden">
+        <md-icon slot="icon">undo</md-icon>
+    </md-fab>
+
     <!-- Fab button to create notes -->
     <md-fab variant="primary" id="add-fab" class="add-button">
         <md-icon slot="icon">add</md-icon>
@@ -207,7 +211,7 @@
         <!-- Bottom Toolbar (attachments, tags, markdown)-->
         <div class="panel-bottom">
             <div class="bottom-icons">
-                <md-icon-button>
+                <md-icon-button onclick="window.showPrototypeModal('Add Media','For this, you would select media using the standard system dialogue to attach to your note.')">
                     <md-icon>add_photo_alternate</md-icon>
                 </md-icon-button>
                 <md-icon-button id="reminder-select">

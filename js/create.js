@@ -294,6 +294,7 @@ submitButton.addEventListener('click', () => {
     createdAt: now,
     lastModifiedAt: now,
   });
+  document.dispatchEvent(new Event('note-created'));
 
   renderAgendaView();
   renderBrowseView();

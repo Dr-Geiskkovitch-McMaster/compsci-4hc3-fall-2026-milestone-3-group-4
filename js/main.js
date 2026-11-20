@@ -161,6 +161,8 @@ function updateStackCount() {
   });
 }
 
+document.addEventListener('note-created', updateStackCount);
+
 document.addEventListener('stack-created', event => {
   renderStacks(event.detail);
 });

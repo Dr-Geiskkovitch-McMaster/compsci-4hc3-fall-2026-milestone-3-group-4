@@ -526,11 +526,9 @@ html::-webkit-scrollbar {
     font-size: smaller;
 }
 
-.note-due-date {
-    position: absolute;
-    color: var(--md-sys-color-on-surface-variant);
-    right: 16px;
-    bottom: 16px;
+.sticky-note--front .note-preview-deadline {
+    top: 8px;
+    right: 8px;
 }
 
 .tag-options,

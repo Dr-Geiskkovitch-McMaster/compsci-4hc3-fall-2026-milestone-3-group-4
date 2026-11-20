@@ -99,6 +99,11 @@ fab.addEventListener('click', () => {
   resetTextArea();
   // render the tags for the current note at the bottom of the text area
   renderTextAreaTags();
+
+  // if panel is full screen, change it back to collapsed
+  if (panel.classList.contains('fullscreen')) {
+    toggleFullScreen();
+  }
   textarea.focus();
 });
 
@@ -132,19 +137,19 @@ function renderTextAreaTags() {
 
 }
 
-// trigger expanding the note creation screen
-expandButton.addEventListener('click', () => {
+function toggleFullScreen() {
   panel.classList.toggle('fullscreen');
   const isFullScreen = panel.classList.contains('fullscreen');
-
   expandIcon.textContent = isFullScreen ? 'collapse_content' : 'expand_content';
-
   panel.style.removeProperty('bottom');
-
-
   updatePanelPosition(panel);
 
   textarea.focus();
+}
+
+// trigger expanding the note creation screen
+expandButton.addEventListener('click', () => {
+  toggleFullScreen();
 
 });
 
@@ -155,7 +160,6 @@ function closePanel() {
   textarea.blur(); 
   panel.classList.add('hidden');
   textareaBackdrop.classList.add('hidden');
-  expandIcon.textContent = 'expand_content';
   fab.classList.remove('hidden');
   todayFab.classList.remove('hidden')
   submitButton.innerHTML = '<md-icon>mic</md-icon>';

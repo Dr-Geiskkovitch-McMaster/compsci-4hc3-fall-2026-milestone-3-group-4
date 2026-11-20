@@ -328,6 +328,34 @@ select,
 
 body.is-fullscreen {
     --fullscreen-bar-height: 0px;
+    --fullscreen-top-inset: max(28px, env(safe-area-inset-top));
+    --fullscreen-bottom-inset: max(16px, env(safe-area-inset-bottom));
+}
+
+body.is-fullscreen .top-nav-bar {
+    padding-top: calc(16px + var(--fullscreen-top-inset));
+}
+
+body.is-fullscreen .special-view-header {
+    padding-top: calc(24px + var(--fullscreen-top-inset));
+}
+
+body.is-fullscreen .nav-drawer {
+    padding-top: calc(16px + var(--fullscreen-top-inset));
+}
+
+body.is-fullscreen .bottom-nav-bar {
+    height: calc(64px + var(--fullscreen-bottom-inset));
+    padding-bottom: var(--fullscreen-bottom-inset);
+}
+
+body.is-fullscreen .add-button,
+body.is-fullscreen .today-button {
+    bottom: calc(90px + var(--fullscreen-bottom-inset));
+}
+
+body.is-fullscreen .draft-button {
+    bottom: calc(160px + var(--fullscreen-bottom-inset));
 }
 
 .bottom-nav-bar {

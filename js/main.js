@@ -62,6 +62,25 @@ const review = initializeReview();
 
 document.getElementById('today-fab')?.addEventListener('click', () => scrollToToday('smooth'));
 
+const fullscreenBar = document.getElementById('fullscreen-bar');
+fullscreenBar?.addEventListener('click', async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (err) {
+    console.warn('Fullscreen request failed:', err);
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  const isFullscreen = Boolean(document.fullscreenElement);
+  document.body.classList.toggle('is-fullscreen', isFullscreen);
+  if (fullscreenBar) {
+    fullscreenBar.hidden = isFullscreen;
+  }
+});
+
 navItems.forEach(item => {
   item.addEventListener('click', () => {
 

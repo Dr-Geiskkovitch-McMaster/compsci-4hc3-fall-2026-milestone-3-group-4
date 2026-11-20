@@ -170,19 +170,35 @@ html::-webkit-scrollbar {
 }
 
 .text-creation-panel.fullscreen {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 100vh !important;
-    border-radius: 0 !important; 
-    padding-top: env(safe-area-inset-top, 16px); 
+    position: fixed;
+    top: var(--vv-top, 0px);
+    bottom: auto;
+    left: var(--vv-left, 0px);
+    right: auto;
+    width: var(--vv-width, 100vw);
+    height: var(--vv-height, 100dvh);
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-creation-panel.fullscreen #typing-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .text-creation-panel.fullscreen .text-creation-textarea {
-    flex: 1;
-    max-height: none;
+    flex: 1 1 auto;
     height: 100%;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+}
+
+.text-creation-panel.fullscreen .textarea-tag-container {
+    flex: 0 0 auto;
 }
 
 .panel-top {
@@ -229,6 +245,7 @@ html::-webkit-scrollbar {
 }
 
 .panel-bottom {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -276,9 +293,16 @@ html::-webkit-scrollbar {
     background: var(--md-sys-color-surface-container); 
     min-width: 100px;
     font: inherit;
-    font-size: smaller;
+    font-size: 16px;
 }
 
+input,
+textarea,
+select,
+#note-tag,
+#created-tag {
+  font-size: 16px;
+}
 
 
 #note-tag {
@@ -288,7 +312,7 @@ html::-webkit-scrollbar {
     outline: 0;
     background: transparent;
     font: inherit;
-    font-size: smaller;
+    font-size: 16px;
 }
 
 .bottom-icons {
@@ -557,7 +581,7 @@ html::-webkit-scrollbar {
     outline: 0;
     background: transparent;
     font: inherit;
-    font-size: smaller;
+    font-size: 16px;
 }
 
 .sticky-note--front .note-preview-deadline {

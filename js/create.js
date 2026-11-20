@@ -35,6 +35,12 @@ const dueDateCancelButton = document.getElementById('due-date-cancel');
 const dueDateSaveButton = document.getElementById('due-date-save');
 const dueDateInput = document.getElementById('due-date-input');
 
+// Draft confirm dialogue
+const draftConfirmDialog = document.getElementById('draft-confirm-dialog');
+const draftConfirmDialogCancel = document.getElementById('draft-cancel-btn');
+const draftConfirmDialogDelete = document.getElementById('draft-delete-btn');
+const draftConfirmDialogSave = document.getElementById('draft-save-btn');
+
 export const tags = [...new Set([...appData.tags])];
 
 let editingNote = null;
@@ -63,6 +69,28 @@ dueDateCancelButton.addEventListener('click', () => {
   dueDateDialog.close();
 });
 
+draftConfirmDialogCancel.addEventListener('click', () => {
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogDelete.addEventListener('click', () => {
+    resetTextArea();
+    dueDateInput.value = '';
+    closePanel();
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogSave.addEventListener('click', () => {
+    resetTextArea();
+    enableDraftsFab();
+    dueDateInput.value = '';
+    closePanel();
+    draftConfirmDialog.close();
+});
+
+draftConfirmDialogCancel.addEventListener('click', () => {
+    draftConfirmDialog.close()
+});
 
 function openDueDateDialog() {
   const earliestReminder = new Date();
@@ -86,6 +114,14 @@ dueDateSaveButton.addEventListener('click', () => {
   dueDateDialog.close();
 
 });
+
+function hasUnsavedContent() {
+  return (
+    textarea.value.trim().length > 0 ||
+    selectedTags.size > 0 ||
+    Boolean(dueDateInput?.value)
+  );
+}
 
 function toLocalDateValue(date) {
     const pad = value => String(value).padStart(2, '0');
@@ -174,6 +210,7 @@ expandButton.addEventListener('click', () => {
 
 
 // hide panel when close button is tapped
+// actually will intercept first for using the save modal
 function closePanel() {
   textarea.blur(); 
   panel.classList.add('hidden');
@@ -184,8 +221,17 @@ function closePanel() {
   panel.style.bottom = '0px';
 }
 
-closeButton.addEventListener('click', closePanel);
-textareaBackdrop.addEventListener('click', closePanel);
+
+function requestClosePanel() {
+  if (!editingNote && hasUnsavedContent()) {
+    draftConfirmDialog.show();
+    return;
+  }
+  closePanel();
+}
+
+closeButton.addEventListener('click', requestClosePanel);
+textareaBackdrop.addEventListener('click', requestClosePanel);
 
 // open tag panel when tag select button is tapped
 selectTagButton.addEventListener('click', () => {

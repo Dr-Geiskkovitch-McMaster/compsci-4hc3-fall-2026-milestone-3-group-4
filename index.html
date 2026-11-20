@@ -270,6 +270,17 @@
         </div>
     </md-dialog>
 
+    <!-- Dialog for confirm save/delete/cancel on new notes -->
+     <md-dialog id="draft-confirm-dialog">
+        <div slot="headline">Save note as draft?</div>
+        <div slot="content">You have unsaved changes in this note.</div>
+        <div slot="actions">
+            <md-text-button id="draft-cancel-btn">Cancel</md-text-button>
+            <md-text-button id="draft-delete-btn">Delete</md-text-button>
+            <md-filled-button id="draft-save-btn">Save as draft</md-filled-button>
+        </div>
+    </md-dialog>
+
     <!-- Dialog for setting reminder information when creating a note -->
     <md-dialog id="due-date-set">
         <div slot="headline">Set Due Date</div>

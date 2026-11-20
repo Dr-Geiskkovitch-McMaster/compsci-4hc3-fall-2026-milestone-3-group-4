@@ -29,7 +29,8 @@
         </md-icon-button>
         
         <!-- Search bar -->
-        <md-filled-text-field 
+        <md-filled-text-field     
+        id="notes-search" 
         type="search"
         placeholder="Search Notes"
         class="filled-search-bar">
@@ -42,6 +43,34 @@
         </div>
 
     </header>
+
+    <!--SANA STUFF: side pannel and search bar stuff-->
+
+
+
+    <!-- <section id="search-panel" class="search-panel" hidden aria-label="Search">
+        <div id="search-content"></div>
+    </section>
+
+    <div id="drawer-panel" class="panel-scrim" hidden></div>
+
+    <aside id="side-panel" class="side-panel" hidden aria-label="Main menu">
+        
+        <h2>Loops</h2>
+
+        <button class="panel-item" type="button"># &nbsp; Manage Tags</button>
+        <button class="panel-item" type="button">◷ &nbsp; Recent</button>
+        <button class="panel-item" type="button">▤ &nbsp; Trash</button>
+        <button class="panel-item" type="button">⚙ &nbsp; Settings</button>
+        <button class="panel-item" type="button">? &nbsp; Help &amp; Feedback</button>
+    </aside> -->
+
+    </header>
+
+    <div id="search-panel" class="search-panel" hidden></div>
+
+
+
 
     <!-- Browse/View all notes view -->
     <main id="browse-view" class="app-view" style="display: none;">
@@ -308,5 +337,7 @@
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/create.js"></script>
+    <script src="js/search.js" defer></script>
+
 </body>
 </html>

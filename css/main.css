@@ -762,3 +762,66 @@ html::-webkit-scrollbar {
     border-radius: 999px;
     font-size: 0.75rem;
 }
+
+/* SANA PARTS */
+
+.search-panel {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+
+.search-panel-heading {
+    margin: 8px;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.search-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+}
+
+button.search-result {
+    cursor: pointer;
+}
+
+.search-result:hover {
+    background: #f4f1f8;
+}
+
+.search-result-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    place-items: center;
+    border-radius: 50%;
+    background: #eeebf4;
+}
+
+.search-result-title {
+    font-size: 0.95rem;
+}
+
+.search-result-description {
+    margin-top: 3px;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.search-panel mark {
+    background: #fff0a8;
+}

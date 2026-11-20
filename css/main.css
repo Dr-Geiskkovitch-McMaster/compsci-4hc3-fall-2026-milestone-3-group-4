@@ -189,6 +189,11 @@ html::-webkit-scrollbar {
     flex-direction: column;
 }
 
+.text-creation-panel.fullscreen #panel-top,
+.text-creation-panel.fullscreen .panel-bottom {
+    flex: 0 0 auto;
+}
+
 .text-creation-panel.fullscreen .text-creation-textarea {
     flex: 1 1 auto;
     height: 100%;

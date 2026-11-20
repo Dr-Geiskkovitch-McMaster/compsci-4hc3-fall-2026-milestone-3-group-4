@@ -4,6 +4,7 @@ import { renderBrowseView } from './browse.js';
 import { initializeReview, stacks as reviewStacks } from './review.js';
 import { renderAgendaView, scrollToToday } from './agenda.js';
 import { openSpecialView } from './specialView.js';
+import { openSearchView } from './search.js';
 import './prototypeModal.js';
 
 // Forces page to reload to today instead of where user was last scrolled
@@ -50,10 +51,10 @@ document.querySelectorAll('.nav-drawer-item').forEach(item => {
 });
 
 const avatarMenu = document.getElementById('top-nav-avatar');
-avatarMenu.addEventListener('click', () => showPrototypeModal('topNavAvatar'));
+avatarMenu.addEventListener('click', () => showPrototypeModal('User Config/Settings', 'This feature would allow the user to manage their accounts, sync, personas, or other environment settings.'));
 
 const searchBar = document.getElementById('notes-search');
-searchBar.addEventListener('click', () => showPrototypeModal('searchBar'));
+searchBar.addEventListener('click', openSearchView);
 
 let lastScrollY = window.scrollY;
 

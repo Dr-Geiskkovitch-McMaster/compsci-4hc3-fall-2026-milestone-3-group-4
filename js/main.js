@@ -41,34 +41,38 @@ navItems.forEach(item => {
     const targetView = document.getElementById(targetId);
     if (targetView) {
       targetView.style.display = 'block';
-      if (targetId === 'browse-view') {
-        renderBrowseView();
-      } else if (targetId === 'agenda-view') {
+      if (targetId === 'agenda-view') {
         renderAgendaView();
+      } else {
+        if (targetId === 'browse-view') {
+          renderBrowseView();
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' }); // Scroll to top for browse and review
       }
     }
   });
 });
 
-window.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY;
-  // Always show at the very top of the page (handles iOS/trackpad bounce)
-  if (currentScrollY <= 0) {
-    topNav.classList.remove('top-nav-bar--hidden');
-    lastScrollY = 0;
-    return;
-  }
-  // Ignore tiny scroll jitter
-  if (Math.abs(currentScrollY - lastScrollY) < 6) return;
-  if (currentScrollY > lastScrollY && currentScrollY > topNav.offsetHeight) {
-    // Scrolling down
-    topNav.classList.add('top-nav-bar--hidden');
-  } else {
-    // Scrolling up
-    topNav.classList.remove('top-nav-bar--hidden');
-  }
-  lastScrollY = currentScrollY;
-}, { passive: true });
+// // Currently disabled 
+// window.addEventListener('scroll', () => {
+//   const currentScrollY = window.scrollY;
+//   // Always show at the very top of the page (handles iOS/trackpad bounce)
+//   if (currentScrollY <= 0) {
+//     topNav.classList.remove('top-nav-bar--hidden');
+//     lastScrollY = 0;
+//     return;
+//   }
+//   // Ignore tiny scroll jitter
+//   if (Math.abs(currentScrollY - lastScrollY) < 6) return;
+//   if (currentScrollY > lastScrollY && currentScrollY > topNav.offsetHeight) {
+//     // Scrolling down
+//     topNav.classList.add('top-nav-bar--hidden');
+//   } else {
+//     // Scrolling up
+//     topNav.classList.remove('top-nav-bar--hidden');
+//   }
+//   lastScrollY = currentScrollY;
+// }, { passive: true });
 /* REVIEW CODE */
 
 /* generate stacks based on stack array */
